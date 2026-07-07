@@ -1,0 +1,50 @@
+package com.samtar.userservice.entity;
+
+
+import com.samtar.enums.ROLE;
+import com.samtar.enums.Status;
+import com.samtar.userservice.constants.MessageConstant;
+import com.samtar.userservice.constants.RegexConstant;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import org.springframework.validation.annotation.Validated;
+
+@Getter
+@Setter
+@RequiredArgsConstructor
+@Entity
+@Table(name = "user_table")
+public class UsersEntity {
+
+    @NotBlank(message = "Username :" + MessageConstant.REQUIRED)
+    @Column(nullable = false, unique = true)
+    @Pattern(
+            regexp = RegexConstant.USERNAME,
+            message = MessageConstant.INVALID_USERNAME
+    )
+    private String username;
+
+    @NotBlank(message = "Email :" + MessageConstant.REQUIRED)
+    @Column(nullable = false, unique = true)
+    @Pattern(
+            regexp = RegexConstant.EMAIL,
+            message = MessageConstant.INVALID_EMAIL
+    )
+    private String email;
+
+    @NotBlank(message = "Password :" + MessageConstant.REQUIRED)
+    @Column(nullable = false)
+    private String password;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private ROLE role = ROLE.USER;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private  Status status = Status.ACTIVE;
+}
