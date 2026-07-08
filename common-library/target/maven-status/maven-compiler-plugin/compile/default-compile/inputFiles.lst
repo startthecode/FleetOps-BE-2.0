@@ -6,3 +6,7 @@ Z:\Study\fullstack\fleetOps-v2\common-library\src\main\java\com\samtar\enums\Ord
 Z:\Study\fullstack\fleetOps-v2\common-library\src\main\java\com\samtar\enums\OrderStatus.java
 Z:\Study\fullstack\fleetOps-v2\common-library\src\main\java\com\samtar\enums\ROLE.java
 Z:\Study\fullstack\fleetOps-v2\common-library\src\main\java\com\samtar\enums\Status.java
+Z:\Study\fullstack\fleetOps-v2\common-library\src\main\java\com\samtar\exception\BaseException.java
+Z:\Study\fullstack\fleetOps-v2\common-library\src\main\java\com\samtar\exception\SessionException.java
+Z:\Study\fullstack\fleetOps-v2\common-library\src\main\java\com\samtar\exception\TokenExceptions.java
+Z:\Study\fullstack\fleetOps-v2\common-library\src\main\java\com\samtar\exception\ValidationException.java

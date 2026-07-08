@@ -22,4 +22,12 @@ public class MessageConstant {
     // Intruder
     public static final String UNAUTHORIZED_USER = "Phone number is already registered.";
 
+
+    // JWT ERROR MESSAGES
+    public static final String INVALID_TOKEN = "INVALID TOKEN";
+    public static final String EXPIRED_TOKEN = "INVALID TOKEN";
+
+   // SERVER FAILURES
+   public static final String FAIL_TO_EXECUTE = "Something went wrong";
+
 }
