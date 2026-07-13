@@ -1,10 +1,12 @@
 spring:
   application:
     name: user-service
-    ## password
-    password.strength: 28
 
-    # JWT tokens
+app:
+  security:
+    password:
+      strength: 28
+
     jwt:
       refresh-token-hex: b2e8317f4232c371712350c249df674724ddcd12043aa258c6b55d0c78e0f9f4
       access-token-hex: 9e7062c709c4ffa8a35d683139cc58dd829068bad4d71efca34dba653ef47b46
@@ -12,15 +14,12 @@ spring:
       access-expiry: 3600000
       token-prefix: Bearer
 
-    #Cookies
     cookie:
-      #Auth
       auth-token:
         name: smtrtkn
-        httpOnly: true
+        http-only: true
         secure: true
-        sameSite: Strict
+        same-site: Strict
         path: /api/v1/
-        domain: *
+        domain: "*"
         expiry: 86400000
-
