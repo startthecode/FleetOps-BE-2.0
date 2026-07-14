@@ -1,10 +1,12 @@
 package com.samtar.userservice.dto.response;
 
+import com.samtar.enums.ROLE;
+
 public record SignUpResDto(
         String accessToken,
         String refreshToken,
         String username,
-        String role,
-        String accessExpiryMs
+        ROLE role,
+        Long accessExpiryMs
 ) {
 }

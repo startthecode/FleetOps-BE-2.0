@@ -1,6 +1,6 @@
 package com.samtar.userservice.constants;
 
-public class MessageConstant {
+public final class MessageConstant {
     private MessageConstant() {}
 
     // Validation Messages
@@ -12,6 +12,7 @@ public class MessageConstant {
 
     // Success Messages
     public static final String USER_CREATED = "User created successfully.";
+    public static final String USER_SIGNIN = "User Sign in successfully.";
     public static final String USER_UPDATED = "User updated successfully.";
 
     // Error Messages
@@ -29,5 +30,9 @@ public class MessageConstant {
 
    // SERVER FAILURES
    public static final String FAIL_TO_EXECUTE = "Something went wrong";
+
+
+   // Sucess
+
 
 }
