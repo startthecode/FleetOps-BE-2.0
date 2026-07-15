@@ -1,7 +1,5 @@
 package com.samtar.userservice.constants;
 
-import jakarta.validation.constraints.Pattern;
-
 public final class RegexConstant {
     private RegexConstant() {}
 

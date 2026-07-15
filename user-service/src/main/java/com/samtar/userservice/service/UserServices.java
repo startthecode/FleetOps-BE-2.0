@@ -30,7 +30,7 @@ public class UserServices {
     private final UserRepository userRepository;
     public UserServices(AuthenticationManager authenticationManager,
                         JwtUtils jwtUtils,
-                        @Value("${app.security.access-expiry}") Long accessExpiry,
+                        @Value("${app.security.jwt.access-expiry}") Long accessExpiry,
                         PasswordEncoder passwordEncoder,
                         UserRepository userRepository) {
         this.accessExpiry = accessExpiry;

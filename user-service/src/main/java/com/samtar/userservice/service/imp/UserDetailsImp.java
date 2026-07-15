@@ -14,8 +14,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 public class UserDetailsImp implements UserDetails {
-    private  final UsersEntity users;
-
+    private final UsersEntity users;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -24,12 +23,12 @@ public class UserDetailsImp implements UserDetails {
 
     @Override
     public @Nullable String getPassword() {
-        return "";
+        return users.getPassword();
     }
 
     @Override
     public String getUsername() {
-        return "";
+        return users.getUsername();
     }
 
     @Override

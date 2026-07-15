@@ -4,15 +4,10 @@ import com.samtar.dto.ExceptionApiResponse;
 import com.samtar.userservice.constants.MessageConstant;
 import com.samtar.userservice.constants.Routes;
 import com.samtar.userservice.service.imp.UserDetailServiceImp;
-import com.samtar.userservice.service.imp.UserDetailsImp;
-import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.constraints.Null;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -29,14 +24,12 @@ import tools.jackson.databind.ObjectMapper;
 @Configuration
 public class SecurityConfig {
     final int passwordStrength;
-    final UserDetailsImp userDetailsImp;
     final UserDetailServiceImp userDetailServiceImp;
     final ObjectMapper mapper;
 
-    public SecurityConfig(ObjectMapper mapper, @Value("${password.strength}") int passwordStrength, UserDetailsImp userDetailsImp, UserDetailServiceImp userDetailServiceImp) {
+    public SecurityConfig(ObjectMapper mapper, @Value("${app.security.password.strength}") int passwordStrength, UserDetailServiceImp userDetailServiceImp) {
         this.mapper = mapper;
         this.passwordStrength = passwordStrength;
-        this.userDetailsImp = userDetailsImp;
         this.userDetailServiceImp = userDetailServiceImp;
     }
 
@@ -58,7 +51,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityConfig(HttpSecurity httpSecurity) {
+    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) {
         return httpSecurity
                 // Disable default session management
                 .csrf(AbstractHttpConfigurer::disable)

@@ -9,7 +9,7 @@ import tools.jackson.databind.ObjectMapper;
 public class Mapper {
 
     @Bean
-    public ObjectMapper mapper(){
+    public ObjectMapper objectMapper(){
         return new ObjectMapper();
     }
 

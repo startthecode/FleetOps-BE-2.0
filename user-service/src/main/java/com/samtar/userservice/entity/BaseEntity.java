@@ -6,9 +6,9 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.hibernate.validator.constraints.UUID;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -29,7 +29,7 @@ public abstract class BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    Status status;
+    Status status = Status.ACTIVE;
 
     @Version
     Long version;

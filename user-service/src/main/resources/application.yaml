@@ -1,25 +1,53 @@
 spring:
+  config:
+    # Load the same .env used by docker-compose. Both paths are optional so
+    # real environment variables (e.g. in Docker) still take precedence.
+    import:
+      - optional:file:.env[.properties]
+      - optional:file:user-service/.env[.properties]
+
   application:
-    name: user-service
+    name: ${SPRING_APPLICATION_NAME:user-service}
+
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+    driver-class-name: ${SPRING_DATASOURCE_DRIVER_CLASS_NAME:org.postgresql.Driver}
+
+  flyway:
+    enabled: false
+    baseline-on-migrate: true
+    locations: classpath:db/migration
+    validate-on-migrate: true
+
+  jpa:
+    database-platform: ${SPRING_JPA_DATABASE_PLATFORM:org.hibernate.dialect.PostgreSQLDialect}
+    hibernate:
+      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:none}
+    show-sql: ${SPRING_JPA_SHOW_SQL:false}
+    properties:
+      hibernate:
+        format_sql: ${SPRING_JPA_PROPERTIES_HIBERNATE_FORMAT_SQL:true}
 
 app:
   security:
     password:
-      strength: 28
+      strength: ${APP_SECURITY_PASSWORD_STRENGTH:28}
 
     jwt:
-      refresh-token-hex: b2e8317f4232c371712350c249df674724ddcd12043aa258c6b55d0c78e0f9f4
-      access-token-hex: 9e7062c709c4ffa8a35d683139cc58dd829068bad4d71efca34dba653ef47b46
-      refresh-expiry: 86400000
-      access-expiry: 3600000
-      token-prefix: Bearer
+      refresh-token-hex: ${APP_SECURITY_JWT_REFRESH_TOKEN_HEX}
+      access-token-hex: ${APP_SECURITY_JWT_ACCESS_TOKEN_HEX}
+      refresh-expiry: ${APP_SECURITY_JWT_REFRESH_EXPIRY:86400000}
+      access-expiry: ${APP_SECURITY_JWT_ACCESS_EXPIRY:3600000}
+      token-prefix: ${APP_SECURITY_JWT_TOKEN_PREFIX:Bearer}
 
     cookie:
       auth-token:
-        name: smtrtkn
-        http-only: true
-        secure: true
-        same-site: Strict
-        path: /api/v1/
-        domain: "*"
-        expiry: 86400000
+        name: ${APP_SECURITY_COOKIE_AUTH_TOKEN_NAME:smtrtkn}
+        http-only: ${APP_SECURITY_COOKIE_AUTH_TOKEN_HTTP_ONLY:true}
+        secure: ${APP_SECURITY_COOKIE_AUTH_TOKEN_SECURE:true}
+        same-site: ${APP_SECURITY_COOKIE_AUTH_TOKEN_SAME_SITE:Strict}
+        path: ${APP_SECURITY_COOKIE_AUTH_TOKEN_PATH:/api/v1/}
+        domain: ${APP_SECURITY_COOKIE_AUTH_TOKEN_DOMAIN:*}
+        expiry: ${APP_SECURITY_COOKIE_AUTH_TOKEN_EXPIRY:86400000}

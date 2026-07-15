@@ -32,10 +32,10 @@ public class JwtUtils {
     private final Long accessTokenExpiry;
 
     public JwtUtils(
-            @Value("${jwt.access-token-hex}") String accessKey,
-            @Value("${jwt.refresh-token-hex}") String refreshKey,
-            @Value("${jwt.access-expiry}") Long accessTokenExpiry,
-            @Value("${jwt.refresh-expiry}") Long refreshTokenExpiry
+        @Value("${app.security.jwt.access-token-hex}") String accessKey,
+        @Value("${app.security.jwt.refresh-token-hex}") String refreshKey,
+        @Value("${app.security.jwt.access-expiry}") Long accessTokenExpiry,
+        @Value("${app.security.jwt.refresh-expiry}") Long refreshTokenExpiry
 
     ) {
         this.accessKey = toSecretKey(accessKey);

@@ -2,7 +2,6 @@ package com.samtar.userservice.entity;
 
 
 import com.samtar.enums.ROLE;
-import com.samtar.enums.Status;
 import com.samtar.userservice.constants.MessageConstant;
 import com.samtar.userservice.constants.RegexConstant;
 import jakarta.persistence.*;
@@ -18,7 +17,7 @@ import org.springframework.validation.annotation.Validated;
 @RequiredArgsConstructor
 @Entity
 @Table(name = "user_table")
-public class UsersEntity {
+public class UsersEntity extends BaseEntity {
 
     @NotBlank(message = "Username :" + MessageConstant.REQUIRED)
     @Column(nullable = false, unique = true)
@@ -43,8 +42,4 @@ public class UsersEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private ROLE role = ROLE.USER;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private  Status status = Status.ACTIVE;
 }
