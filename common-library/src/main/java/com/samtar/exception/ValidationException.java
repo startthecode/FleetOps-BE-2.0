@@ -4,8 +4,8 @@ import java.util.Map;
 
 public class ValidationException extends BaseException {
     private final Map<String, String> errors;
-    public ValidationException(String message,Map<String, String> errors) {
-        super(message);
+    public ValidationException(String message,Object statusCode,Map<String, String> errors) {
+        super(message,statusCode);
         this.errors = errors;
     }
 }

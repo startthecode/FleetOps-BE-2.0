@@ -41,7 +41,7 @@ public class UserServices {
     }
 
     // signin
-    @Transactional()
+    @Transactional
     public SignInRespDto signin(SignInReqDto req) {
         Authentication userServices = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(req.username(), req.password())
@@ -68,7 +68,10 @@ public class UserServices {
         newUser.setUsername(req.username());
         if (req.isVendorCreation()) {
             newUser.setRole(ROLE.VENDOR);
+        }else {
+            newUser.setRole(ROLE.USER);
         }
+
         userRepository.save(newUser);
         Tokens tokens = generateTokens(newUser);
         return new SignUpResDto(

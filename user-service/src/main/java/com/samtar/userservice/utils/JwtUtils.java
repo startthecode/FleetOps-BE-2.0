@@ -14,6 +14,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.hibernate.exception.AuthException;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -45,6 +46,7 @@ public class JwtUtils {
     }
 
     public String generateToken(TokenTypes tokenType, JwtClaimsDto data) {
+        System.out.println("testing in ---======");
         SecretKey secretKey = TokenTypes.REFRESH_TOKEN == tokenType ? this.refreshKey : this.accessKey;
         long expiry = TokenTypes.REFRESH_TOKEN == tokenType ? this.refreshTokenExpiry : this.accessTokenExpiry;
         Map<String, Object> claims = new HashMap<>();
@@ -58,12 +60,12 @@ public class JwtUtils {
         try {
             return parseClaims(token, secretKey);
         } catch (ExpiredJwtException ex) {
-            throw new TokenExceptions(MessageConstant.EXPIRED_TOKEN);
+            throw new TokenExceptions(MessageConstant.EXPIRED_TOKEN, HttpStatus.UNAUTHORIZED);
         } catch (JwtException ex) {
-            throw new TokenExceptions(MessageConstant.INVALID_TOKEN);
+            throw new TokenExceptions(MessageConstant.INVALID_TOKEN,HttpStatus.UNAUTHORIZED);
 
         } catch (Exception ex) {
-            throw new BaseException(MessageConstant.FAIL_TO_EXECUTE);
+            throw new BaseException(MessageConstant.FAIL_TO_EXECUTE,HttpStatus.UNAUTHORIZED);
         }
     }
 

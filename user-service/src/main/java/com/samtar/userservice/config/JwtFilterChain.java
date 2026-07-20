@@ -14,6 +14,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NonNull;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -42,13 +43,13 @@ public class JwtFilterChain extends OncePerRequestFilter {
     try {
         String authorization = request.getHeader("Authorization");
         if(authorization == null || !authorization.startsWith("Bearer ")){
-            throw new TokenExceptions(MessageConstant.UNAUTHORIZED_USER);
+            throw new TokenExceptions(MessageConstant.UNAUTHORIZED_USER, HttpStatus.UNAUTHORIZED);
         }
 
         String accessToken = authorization.substring(7);
-        if(accessToken.isEmpty()) throw new TokenExceptions(MessageConstant.UNAUTHORIZED_USER);
+        if(accessToken.isEmpty()) throw new TokenExceptions(MessageConstant.UNAUTHORIZED_USER, HttpStatus.UNAUTHORIZED);
         JwtClaimsDto decodedToken = jwtUtils.decodeToken(accessToken, TokenTypes.ACCESS_TOKEN);
-        if(decodedToken.username() == null ||  decodedToken.userRole() == null) throw new TokenExceptions(MessageConstant.UNAUTHORIZED_USER);
+        if(decodedToken.username() == null ||  decodedToken.userRole() == null) throw new TokenExceptions(MessageConstant.UNAUTHORIZED_USER, HttpStatus.UNAUTHORIZED);
         boolean isNotAuthenticated = SecurityContextHolder.getContext().getAuthentication() != null;
         if(isNotAuthenticated){
             UserDetails loggedInUser = userDetailServiceImp.loadUserByUsername(decodedToken.username());
@@ -58,7 +59,7 @@ public class JwtFilterChain extends OncePerRequestFilter {
         }
         filterChain.doFilter(request,response);
     } catch (Exception e) {
-        throw new RuntimeException(e);
+        exceptionHandling(request,response,e);
     }
     }
 
