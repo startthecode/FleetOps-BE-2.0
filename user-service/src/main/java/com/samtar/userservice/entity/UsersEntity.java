@@ -1,6 +1,9 @@
 package com.samtar.userservice.entity;
 
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.samtar.enums.ROLE;
 import com.samtar.userservice.constants.MessageConstant;
 import com.samtar.userservice.constants.RegexConstant;
@@ -10,7 +13,6 @@ import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import org.springframework.validation.annotation.Validated;
 
 @Getter
 @Setter
@@ -42,4 +44,8 @@ public class UsersEntity extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private ROLE role = ROLE.USER;
+
+    //Connection with session entity
+    @OneToMany(mappedBy="user",cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<SessionEntity> sessions = new ArrayList<>();
 }

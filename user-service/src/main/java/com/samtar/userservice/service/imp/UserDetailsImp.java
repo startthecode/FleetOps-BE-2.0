@@ -2,7 +2,6 @@ package com.samtar.userservice.service.imp;
 
 import com.samtar.enums.Status;
 import com.samtar.userservice.entity.UsersEntity;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.Nullable;
 import org.springframework.security.core.GrantedAuthority;

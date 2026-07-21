@@ -17,7 +17,7 @@ public abstract class BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    UUID userid;
+    UUID id;
 
     @CreationTimestamp
     @Column(updatable = false, nullable = false)

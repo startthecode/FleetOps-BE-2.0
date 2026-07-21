@@ -14,7 +14,6 @@ public record SignUpReqDto(
         @NotBlank(message = "Email can not be blank") @Pattern(regexp = RegexConstant.EMAIL, message = MessageConstant.INVALID_EMAIL) String email,
 
         Boolean isVendorCreation
-
 )
 
 {

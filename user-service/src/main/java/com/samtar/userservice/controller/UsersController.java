@@ -8,7 +8,9 @@ import com.samtar.userservice.dto.response.SignInRespDto;
 import com.samtar.userservice.dto.response.SignUpResDto;
 import com.samtar.userservice.service.UserServices;
 import com.samtar.userservice.shared.AuthCookieUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,7 +28,7 @@ public class UsersController {
     private final AuthCookieUtil authCookieUtil;
 
     @PostMapping("/signin")
-    public ResponseEntity<SuccessApiResponse<SignInRespDto>> signIn(@RequestBody SignInReqDto req,
+    public ResponseEntity<SuccessApiResponse<SignInRespDto>> signIn(@Valid @RequestBody SignInReqDto req,
             HttpServletResponse response) {
         SignInRespDto responseData = userServices.signin(req);
         SuccessApiResponse<SignInRespDto> resp = new SuccessApiResponse<>(MessageConstant.USER_SIGNIN, responseData,
@@ -36,12 +38,12 @@ public class UsersController {
     }
 
     @PostMapping("/signup") 
-    public ResponseEntity<SuccessApiResponse<SignUpResDto>> signUp(@RequestBody SignUpReqDto req,
+    public ResponseEntity<SuccessApiResponse<SignUpResDto>> signUp(@Valid @RequestBody SignUpReqDto req,
             HttpServletResponse response) {
             SignUpResDto responseData = userServices.signUp(req);
         SuccessApiResponse<SignUpResDto> resp = new SuccessApiResponse<>(MessageConstant.USER_CREATED, responseData,
                 LocalDateTime.now());
-//        response.addCookie(authCookieUtil.addAuthTokenCookie(responseData.refreshToken()));
+       response.addCookie(authCookieUtil.addAuthTokenCookie(responseData.refreshToken()));
         return ResponseEntity.ok(resp);
     }
 }

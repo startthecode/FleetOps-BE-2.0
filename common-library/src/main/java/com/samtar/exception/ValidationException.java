@@ -8,4 +8,8 @@ public class ValidationException extends BaseException {
         super(message,statusCode);
         this.errors = errors;
     }
+
+    public Map<String, String> getErrors() {
+        return errors;
+    }
 }

@@ -46,12 +46,12 @@ public class JwtUtils {
     }
 
     public String generateToken(TokenTypes tokenType, JwtClaimsDto data) {
-        System.out.println("testing in ---======");
         SecretKey secretKey = TokenTypes.REFRESH_TOKEN == tokenType ? this.refreshKey : this.accessKey;
         long expiry = TokenTypes.REFRESH_TOKEN == tokenType ? this.refreshTokenExpiry : this.accessTokenExpiry;
         Map<String, Object> claims = new HashMap<>();
         claims.put("role", data.userRole());
         claims.put("username", data.username());
+        claims.put("sessionId", data.sessionId());
         return Jwts.builder().signWith(secretKey).claims(claims).expiration(new Date(System.currentTimeMillis() + expiry)).issuedAt(new Date()).compact();
     }
 
@@ -74,7 +74,8 @@ public class JwtUtils {
         Claims data = Jwts.parser().verifyWith(key).build().parseSignedClaims(token).getPayload();
         return new JwtClaimsDto(
                 (String) data.get("username"),
-                (ROLE) data.get("role"));
+                (ROLE) data.get("role"),
+                (String) data.get("sessionId"));
     }
 
 

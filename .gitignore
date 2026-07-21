@@ -1,0 +1,29 @@
+# Environment files
+.env
+.env.*
+!.env.example
+
+# IDE and editor files
+.vscode/
+.idea/
+*.iml
+*.swp
+*.swo
+
+# Build and generated outputs
+target/
+build/
+out/
+.gradle/
+**/target/
+**/build/
+
+# Logs and temp files
+*.log
+*.tmp
+*.temp
+tmp/
+
+# OS files
+.DS_Store
+Thumbs.db

@@ -51,3 +51,6 @@ app:
         path: ${APP_SECURITY_COOKIE_AUTH_TOKEN_PATH:/api/v1/}
         domain: ${APP_SECURITY_COOKIE_AUTH_TOKEN_DOMAIN:*}
         expiry: ${APP_SECURITY_COOKIE_AUTH_TOKEN_EXPIRY:86400000}
+
+    authentication:
+      max-session: ${APP_SECURITY_AUTHENTICATION_MAX_ATTEMPTS:5}
