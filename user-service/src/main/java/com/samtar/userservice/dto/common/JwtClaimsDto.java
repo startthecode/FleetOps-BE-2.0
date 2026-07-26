@@ -5,6 +5,7 @@ import com.samtar.enums.ROLE;
 public record JwtClaimsDto(
         String username,
         ROLE userRole,
+        String userId,
         String sessionId
 ) {
 

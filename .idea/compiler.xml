@@ -24,10 +24,14 @@
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="common" target="1.8" />
+      <module name="common-cache" target="25" />
+      <module name="common-redis" target="21" />
+      <module name="redis-cache" target="25" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="redis-cache" options="-parameters" />
       <module name="user-service" options="-parameters" />
     </option>
   </component>

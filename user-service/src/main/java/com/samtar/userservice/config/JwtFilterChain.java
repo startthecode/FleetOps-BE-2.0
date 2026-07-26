@@ -2,6 +2,7 @@ package com.samtar.userservice.config;
 
 import com.samtar.dto.ExceptionApiResponse;
 import com.samtar.exception.TokenExceptions;
+import com.samtar.userservice.cache.AuthSessionValidation;
 import com.samtar.userservice.constants.MessageConstant;
 import com.samtar.userservice.constants.Routes;
 import com.samtar.userservice.dto.common.JwtClaimsDto;
@@ -38,46 +39,52 @@ public class JwtFilterChain extends OncePerRequestFilter {
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
     private final List<String> unProtectedRoutes = List.of(Routes.unprotected);
     private final ObjectMapper mapper;
+    private final AuthSessionValidation authSessionValidation;
+
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
-    try {
-        String authorization = request.getHeader("Authorization");
-        if(authorization == null || !authorization.startsWith("Bearer ")){
-            throw new TokenExceptions(MessageConstant.UNAUTHORIZED_USER, HttpStatus.UNAUTHORIZED);
-        }
+        try {
+            String authorization = request.getHeader("Authorization");
+            if (authorization == null || !authorization.startsWith("Bearer ")) {
+                throw new TokenExceptions(MessageConstant.UNAUTHORIZED_USER, HttpStatus.UNAUTHORIZED);
+            }
 
-        String accessToken = authorization.substring(7);
-        if(accessToken.isEmpty()) throw new TokenExceptions(MessageConstant.UNAUTHORIZED_USER, HttpStatus.UNAUTHORIZED);
-        JwtClaimsDto decodedToken = jwtUtils.decodeToken(accessToken, TokenTypes.ACCESS_TOKEN);
-        if(decodedToken.username() == null ||  decodedToken.userRole() == null) throw new TokenExceptions(MessageConstant.UNAUTHORIZED_USER, HttpStatus.UNAUTHORIZED);
-        boolean isNotAuthenticated = SecurityContextHolder.getContext().getAuthentication() != null;
-        if(isNotAuthenticated){
-            UserDetails loggedInUser = userDetailServiceImp.loadUserByUsername(decodedToken.username());
-            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(loggedInUser,null,loggedInUser.getAuthorities());
+            String accessToken = authorization.substring(7);
+            if (accessToken.isEmpty())
+                throw new TokenExceptions(MessageConstant.UNAUTHORIZED_USER, HttpStatus.UNAUTHORIZED);
+            JwtClaimsDto decodedToken = jwtUtils.decodeToken(accessToken, TokenTypes.ACCESS_TOKEN);
+            if (decodedToken.username() == null || decodedToken.userRole() == null)
+                throw new TokenExceptions(MessageConstant.UNAUTHORIZED_USER, HttpStatus.UNAUTHORIZED);
+            if (!Boolean.TRUE.equals(authSessionValidation.validateSession(decodedToken.sessionId()))) {
+                throw new TokenExceptions(MessageConstant.UNAUTHORIZED_USER, HttpStatus.UNAUTHORIZED);
+            }
+            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                    decodedToken.username(), null, null);
             authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+            request.setAttribute("x-userid",decodedToken.userId());
+            request.setAttribute("x-sessionid",decodedToken.sessionId());
+            filterChain.doFilter(request, response);
+        } catch (Exception e) {
+            exceptionHandling(request, response, e);
         }
-        filterChain.doFilter(request,response);
-    } catch (Exception e) {
-        exceptionHandling(request,response,e);
-    }
     }
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         String reqRoutes = request.getServletPath();
-        return unProtectedRoutes.stream().anyMatch(e->pathMatcher.match(e,reqRoutes));
+        return unProtectedRoutes.stream().anyMatch(e -> pathMatcher.match(e, reqRoutes));
     }
 
-    private void exceptionHandling(HttpServletRequest request,HttpServletResponse response, Exception exception) throws IOException {
+    private void exceptionHandling(HttpServletRequest request, HttpServletResponse response, Exception exception) throws IOException {
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        if(exception instanceof TokenExceptions){
-            ExceptionApiResponse<String> customResp = new ExceptionApiResponse<>(exception.getMessage(),null, LocalDateTime.now());
-            mapper.writeValue(response.getWriter(),customResp);
-        }else {
-            ExceptionApiResponse<String> customResp = new ExceptionApiResponse<>(MessageConstant.UNAUTHORIZED_USER,null, LocalDateTime.now());
-            mapper.writeValue(response.getWriter(),customResp);
+        if (exception instanceof TokenExceptions) {
+            ExceptionApiResponse<String> customResp = new ExceptionApiResponse<>(exception.getMessage(), null, LocalDateTime.now());
+            mapper.writeValue(response.getWriter(), customResp);
+        } else {
+            ExceptionApiResponse<String> customResp = new ExceptionApiResponse<>(MessageConstant.UNAUTHORIZED_USER, null, LocalDateTime.now());
+            mapper.writeValue(response.getWriter(), customResp);
         }
 
     }

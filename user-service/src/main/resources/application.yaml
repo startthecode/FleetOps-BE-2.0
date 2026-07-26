@@ -30,10 +30,16 @@ spring:
       hibernate:
         format_sql: ${SPRING_JPA_PROPERTIES_HIBERNATE_FORMAT_SQL:true}
 
+  data:
+    redis:
+      port: 6380
+      host: localhost
+      password: mypassword
+
 app:
   security:
     password:
-      strength: ${APP_SECURITY_PASSWORD_STRENGTH:28}
+      strength: ${APP_SECURITY_PASSWORD_STRENGTH:8}
 
     jwt:
       refresh-token-hex: ${APP_SECURITY_JWT_REFRESH_TOKEN_HEX}
@@ -54,3 +60,6 @@ app:
 
     authentication:
       max-session: ${APP_SECURITY_AUTHENTICATION_MAX_ATTEMPTS:5}
+
+    cache:
+      session-expiry: ${APP_SECURITY_CACHE_SESSION_EXPIRY_DAYS:1}

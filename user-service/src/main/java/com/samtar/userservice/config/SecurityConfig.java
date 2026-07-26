@@ -19,6 +19,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import tools.jackson.databind.ObjectMapper;
 
 @Configuration
@@ -26,11 +27,16 @@ public class SecurityConfig {
     final int passwordStrength;
     final UserDetailServiceImp userDetailServiceImp;
     final ObjectMapper mapper;
-
-    public SecurityConfig(ObjectMapper mapper, @Value("${app.security.password.strength}") int passwordStrength, UserDetailServiceImp userDetailServiceImp) {
+    final JwtFilterChain jwtFilterChain;
+    public SecurityConfig(
+            ObjectMapper mapper,
+                          JwtFilterChain jwtFilterChain,
+            @Value("${app.security.password.strength}") int passwordStrength,
+            UserDetailServiceImp userDetailServiceImp) {
         this.mapper = mapper;
         this.passwordStrength = passwordStrength;
         this.userDetailServiceImp = userDetailServiceImp;
+        this.jwtFilterChain = jwtFilterChain;
     }
 
     @Bean
@@ -65,6 +71,7 @@ public class SecurityConfig {
                 .sessionManagement(sm ->
                         sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())
+                .addFilterBefore(jwtFilterChain, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(e-> e.authenticationEntryPoint((re,res,er)->{
                     res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                     res.setContentType(MediaType.APPLICATION_JSON_VALUE);

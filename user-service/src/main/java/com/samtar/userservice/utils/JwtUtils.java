@@ -12,6 +12,7 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.exception.AuthException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -23,6 +24,7 @@ import java.util.HashMap;
 import java.util.HexFormat;
 import java.util.Map;
 
+@Slf4j
 @Component
 public class JwtUtils {
 
@@ -51,6 +53,7 @@ public class JwtUtils {
         Map<String, Object> claims = new HashMap<>();
         claims.put("role", data.userRole());
         claims.put("username", data.username());
+        claims.put("userid", data.userId());
         claims.put("sessionId", data.sessionId());
         return Jwts.builder().signWith(secretKey).claims(claims).expiration(new Date(System.currentTimeMillis() + expiry)).issuedAt(new Date()).compact();
     }
@@ -65,6 +68,7 @@ public class JwtUtils {
             throw new TokenExceptions(MessageConstant.INVALID_TOKEN,HttpStatus.UNAUTHORIZED);
 
         } catch (Exception ex) {
+            log.info("error --- ",ex);
             throw new BaseException(MessageConstant.FAIL_TO_EXECUTE,HttpStatus.UNAUTHORIZED);
         }
     }
@@ -74,7 +78,8 @@ public class JwtUtils {
         Claims data = Jwts.parser().verifyWith(key).build().parseSignedClaims(token).getPayload();
         return new JwtClaimsDto(
                 (String) data.get("username"),
-                (ROLE) data.get("role"),
+                ROLE.valueOf((String) data.get("role")),
+                (String) data.get("userid"),
                 (String) data.get("sessionId"));
     }
 

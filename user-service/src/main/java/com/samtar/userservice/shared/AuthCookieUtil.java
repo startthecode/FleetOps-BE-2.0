@@ -45,4 +45,17 @@ public final class AuthCookieUtil {
         return cookie;
     }
 
+    public Cookie removeAuthTokenCookie() {
+        Cookie cookie = new Cookie(
+                (String) authCookie.get("name"),
+                null
+        );
+        cookie.setHttpOnly((Boolean) authCookie.get("httpOnly"));
+        cookie.setSecure((Boolean) authCookie.get("secure"));
+        cookie.setPath((String) authCookie.get("path"));
+        cookie.setDomain((String) authCookie.get("domain"));
+        cookie.setMaxAge(0); // if expiry is in seconds
+        return cookie;
+    }
+
 }
