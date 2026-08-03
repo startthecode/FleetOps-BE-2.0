@@ -64,6 +64,7 @@ public class JwtFilterChain extends OncePerRequestFilter {
             SecurityContextHolder.getContext().setAuthentication(authenticationToken);
             request.setAttribute("x-userid",decodedToken.userId());
             request.setAttribute("x-sessionid",decodedToken.sessionId());
+            request.setAttribute("x-user-role",decodedToken.userRole());
             filterChain.doFilter(request, response);
         } catch (Exception e) {
             exceptionHandling(request, response, e);

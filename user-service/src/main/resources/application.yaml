@@ -1,7 +1,5 @@
 spring:
   config:
-    # Load the same .env used by docker-compose. Both paths are optional so
-    # real environment variables (e.g. in Docker) still take precedence.
     import:
       - optional:file:.env[.properties]
       - optional:file:user-service/.env[.properties]
@@ -34,7 +32,7 @@ spring:
     redis:
       port: 6380
       host: localhost
-      password: mypassword
+      password: redisMaiNahiBtaunga
 
 app:
   security:

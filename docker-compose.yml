@@ -1,21 +1,44 @@
-version: "3.9"
-
 services:
+  postgres:
+    image: postgres:17
+    container_name: ${POSTGRES_CONTAINER_NAME}
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      PGDATA: ${POSTGRES_DATA_PATH}
+
+    ports:
+      - "${POSTGRES_PORT}:5432"
+
+    volumes:
+      - postgres_data:${POSTGRES_DATA_PATH}
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   redis:
     image: redis:8-alpine
-    container_name: redis
+    container_name: REDIS
     restart: unless-stopped
 
     ports:
       - "${REDIS_PORT}:6379"
-
-    volumes:
-      - redis-data:/data
 
     command: >
       redis-server
       --appendonly yes
       --requirepass ${REDIS_PASSWORD}
 
+    volumes:
+      - redis_data:/data
+
 volumes:
-  redis-data:
+  postgres_data:
+  redis_data:
