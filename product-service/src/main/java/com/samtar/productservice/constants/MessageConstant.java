@@ -65,6 +65,32 @@ public final class MessageConstant {
 
 
   public static final String UNAUTHORIZED_USER = "Unauthorized user.";
+  public static final String PRODUCT_ID_MANDATORY = "Product Id is required";
 
+  public static final String PRODUCT_NAME_MAX_LENGTH = "Product name cannot exceed 255 characters";
+
+  public static final String PRODUCT_SKU_MAX_LENGTH = "SKU cannot exceed 100 characters";
+
+  public static final String PRODUCT_DESCRIPTION_MAX_LENGTH = "Description cannot exceed 1000 characters";
+
+  public static final String PRODUCT_UNIT_MAX_LENGTH = "Unit cannot exceed 30 characters";
+
+  public static final String PRODUCT_BARCODE_MAX_LENGTH = "Barcode cannot exceed 200 characters";
+
+  public static final String PRODUCT_IMAGE_URL_MAX_LENGTH = "Image URL cannot exceed 500 characters";
+
+  public static final String PRODUCT_IMAGE_URL_INVALID = "Image URL must be a valid URL";
+
+  public static final String PRODUCT_MANUFACTURER_MAX_LENGTH = "Manufacturer cannot exceed 255 characters";
+
+  public static final String PRODUCT_COUNTRY_OF_ORIGIN_MAX_LENGTH = "Country of origin cannot exceed 100 characters";
+
+  public static final String PRODUCT_TAX_CODE_MAX_LENGTH = "Tax code cannot exceed 100 characters";
+
+  public static final String PRODUCT_NOTES_MAX_LENGTH = "Notes cannot exceed 1000 characters";
+
+  public static final String PRODUCT_TAX_PERCENTAGE_NEGATIVE = "Tax percentage cannot be negative";
+
+  public static final String PRODUCT_TAX_PERCENTAGE_EXCEED = "Tax percentage cannot exceed 100";
 
 }

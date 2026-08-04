@@ -9,4 +9,6 @@ import java.util.UUID;
 public interface ProductRepository extends JpaRepository<ProductEntity, UUID> {
     List<ProductEntity> findByCategoryId(UUID category_id);
     List<ProductEntity> findBySellerId(UUID seller_id);
+    Boolean existsByProductNameIgnoreCase(String productName);
+    Boolean existsBySkuNameIgnoreCase(String productSku);
 }
