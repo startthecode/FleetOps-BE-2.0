@@ -6,6 +6,7 @@ import com.samtar.productservice.dto.response.ProductRespDto;
 import com.samtar.productservice.entity.ProductEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 import java.util.List;
 
@@ -17,7 +18,9 @@ public interface ProductMapper {
     @Mapping(ignore = true,target = "version")
     ProductEntity toEntity(CreateProductReqDto productReqDto);
 
-    @Mapping(ignore = true,target = "version")
+    void toUpdatedEntity(@MappingTarget ProductEntity product,UpdateProductReqDto payload);
+
     ProductRespDto toResponse(ProductEntity ProductEntity);
+
     List<ProductRespDto> toResponse(List<ProductEntity> ProductEntity);
 }

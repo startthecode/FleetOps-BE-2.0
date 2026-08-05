@@ -36,8 +36,8 @@ public final class MessageConstant {
   public static final String INVALID_TOKEN = "INVALID TOKEN";
   public static final String EXPIRED_TOKEN = "INVALID TOKEN";
 
-  // SERVER FAILURES
-  public static final String FAIL_TO_EXECUTE = "Something went wrong";
+// SERVER FAILURES
+public static final String FAIL_TO_EXECUTE = "Something went wrong";
 
   // Sucess
 

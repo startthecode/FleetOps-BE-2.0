@@ -1,3 +1,6 @@
+server:
+  port: 1001
+
 spring:
   config:
     import:

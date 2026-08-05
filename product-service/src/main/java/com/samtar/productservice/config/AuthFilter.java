@@ -18,6 +18,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 import tools.jackson.databind.ObjectMapper;
@@ -28,6 +29,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RequiredArgsConstructor
+@Component
 public class AuthFilter extends OncePerRequestFilter {
     private final ObjectMapper mapper;
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
@@ -41,6 +43,8 @@ public class AuthFilter extends OncePerRequestFilter {
         try {
             String userID = request.getHeader(ReqHeadersKeys.USER_ID);
             String role = request.getHeader(ReqHeadersKeys.USER_ROLE);
+            System.out.println(userID);
+            System.out.println(role);
             if (userID == null || role == null) {
                 throw new SessionException(MessageConstant.UNAUTHORIZED_USER, HttpStatus.UNAUTHORIZED);
             }

@@ -19,7 +19,12 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity securityHttp){
-        return securityHttp.csrf(AbstractHttpConfigurer::disable).authorizeHttpRequests(a->a.anyRequest().authenticated()).addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class).build();
+        return securityHttp.csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(
+                        a->
+                                a.anyRequest()
+                                        .authenticated())
+                .addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class).build();
     }
 
 }

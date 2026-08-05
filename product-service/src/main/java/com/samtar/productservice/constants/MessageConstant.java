@@ -54,6 +54,7 @@ public final class MessageConstant {
   public static final String PRODUCT_ALREADY_INACTIVE = "Product is already inactive.";
   public static final String REORDER_LEVEL_REACHED = "Product has reached the reorder level.";
 
+  public static final String INVALID_JSON = "Invalid JSON format";
 
   public static final String PRODUCT_SKU_MANDATORY = "SKU cannot be blank.";
   public static final String CATEGORY_ID_MANDATORY = "Category is required.";
@@ -92,5 +93,13 @@ public final class MessageConstant {
   public static final String PRODUCT_TAX_PERCENTAGE_NEGATIVE = "Tax percentage cannot be negative";
 
   public static final String PRODUCT_TAX_PERCENTAGE_EXCEED = "Tax percentage cannot exceed 100";
+
+  // generic
+  public static final String INVALID_PAYLOAD = "Invalid payload.";
+  public static final String METHOD_NOT_ALLOWED = "Method not allowed.";
+
+
+  // SERVER FAILURES
+  public static final String FAIL_TO_EXECUTE = "Something went wrong";
 
 }
