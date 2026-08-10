@@ -3,7 +3,6 @@ package com.samtar.productservice.config;
 import com.samtar.consts.ReqHeadersKeys;
 import com.samtar.dto.ExceptionApiResponse;
 import com.samtar.exception.SessionException;
-import com.samtar.exception.TokenExceptions;
 import com.samtar.productservice.constants.MessageConstant;
 import com.samtar.productservice.constants.Routes;
 import jakarta.servlet.FilterChain;
@@ -14,7 +13,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -26,7 +24,6 @@ import tools.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 
 @RequiredArgsConstructor
 @Component

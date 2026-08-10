@@ -11,6 +11,7 @@
         <option value="$PROJECT_DIR$/redis-cache/pom.xml" />
         <option value="$PROJECT_DIR$/product-service/pom.xml" />
         <option value="$PROJECT_DIR$/common-library/product-service/pom.xml" />
+        <option value="$PROJECT_DIR$/kafka-avro-schemas/pom.xml" />
       </list>
     </option>
     <option name="ignoredFiles">

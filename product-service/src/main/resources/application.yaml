@@ -10,7 +10,6 @@ spring:
   application:
     name: ${SPRING_APPLICATION_NAME:product-service}
 
-
   datasource:
     url: ${SPRING_DATASOURCE_URL}
     username: ${SPRING_DATASOURCE_USERNAME}
@@ -37,3 +36,37 @@ spring:
       port: ${REDIS_PORT}
       host: ${REDIS_HOST}
       password: ${REDIS_PASSWORD}
+
+  kafka:
+    bootstrap-server: ${KAFKA_BOOTSTRAP_SERVER}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: io.confluent.kafka.serializers.KafkaAvroSerializer
+      acks: ${KAFKA_PRODUCER_ACKS}
+      properties:
+
+        ## schema connection for avro
+        schema.registry.url: ${AVRO_REGISTRY_URL}
+
+        ## Batching
+        linger.ms: ${KAFKA_PRODUCER_LINGER_MS}
+        batch.size: ${KAFKA_PRODUCER_BATCH_SIZE}
+        compression.type: ${KAFKA_PRODUCER_BATCH_COMPRESSON_TYPE}
+
+        ## Max request per flight
+        max.in.flight.request.per.connection: ${KAFKA_PRODUCER_FLIGHT_REQ_PER_CONNECTION}
+
+        ## total retires
+        retries: ${KAFKA_PRODUCER_RETRIES}
+
+        ## No duplicates
+        enable.idimpotence: ${KAFKA_PRODUCER_IDIMPOTENCE}
+
+        ## Max request time
+        request.timeout.ms: ${KAFKA_PRODUCER_REQ_TIMEOUT_MS}
+
+        ## Max time between retry
+        delivery.timeout.ms: ${KAFKA_PRODUCER_DELIVERY_TIMEOUT_MS}
+
+        ## Interval between retry
+        retry.backoff.ms: ${KAFKA_PRODUCER_RETRIES_INTERVAL_MS}

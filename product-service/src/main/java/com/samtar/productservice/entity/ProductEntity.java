@@ -1,6 +1,4 @@
 package com.samtar.productservice.entity;
-
-
 import com.samtar.productservice.constants.MessageConstant;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -9,19 +7,18 @@ import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.util.UUID;
 
 
+@Entity
+@Table(name = "product_items")
 @Getter
 @Setter
-@Entity
-@RequiredArgsConstructor
-@Table(name = "product_items")
+@AllArgsConstructor
+@NoArgsConstructor
 public class ProductEntity extends BaseEntity{
     @Column(unique = true, nullable = false, length = 255)
     @NotBlank(message = MessageConstant.PRODUCT_NAME_MANDATORY)
