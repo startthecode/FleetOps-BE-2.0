@@ -38,11 +38,6 @@ public class OutboxEventEntity {
     @Column(name = "aggregate_id", nullable = false)
     private UUID aggregateId;
 
-    @Column(name = "aggregate_type", nullable = false, length = 50)
-    private String aggregateType;
-
-    @Column(name = "event_type", nullable = false, length = 100)
-    private String eventType;
 
     @Column(nullable = false, columnDefinition = "TEXT")
     private String payload;
@@ -65,4 +60,8 @@ public class OutboxEventEntity {
 
     @Column(name = "published_at")
     private Instant publishedAt;
+
+    @Version
+    private Long version;
+
 }
