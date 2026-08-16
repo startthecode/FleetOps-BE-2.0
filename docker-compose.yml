@@ -1,4 +1,8 @@
 services:
+
+  # ============================================================
+  # POSTGRES
+  # ============================================================
   postgres:
     image: postgres:17
     container_name: ${POSTGRES_CONTAINER_NAME}
@@ -23,6 +27,10 @@ services:
       timeout: 5s
       retries: 5
 
+
+  # ============================================================
+  # REDIS
+  # ============================================================
   redis:
     image: redis:8-alpine
     container_name: REDIS
@@ -39,6 +47,146 @@ services:
     volumes:
       - redis_data:/data
 
+
+  # ============================================================
+  # KAFKA
+  # ============================================================
+
+  kafka:
+    image: apache/kafka:4.0.1
+    container_name: KAFKA
+    restart: unless-stopped
+
+    ports:
+      - "${KAFKA_PORT}:9092" # Host -> Kafka external listener
+
+    environment:
+
+      KAFKA_NODE_ID: 1 # Unique Kafka node ID
+
+      KAFKA_PROCESS_ROLES: broker,controller # Single node = broker + KRaft controller
+
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093 # KRaft controller
+
+      # INTERNAL  -> Docker containers
+      # EXTERNAL  -> Host machine
+      # CONTROLLER -> KRaft
+      KAFKA_LISTENERS: INTERNAL://:29092,EXTERNAL://:9092,CONTROLLER://:9093
+
+      # Address Kafka gives back to clients after they connect.
+      #
+      # Docker clients receive:
+      #   kafka:29092
+      #
+      # Host clients receive:
+      #   localhost:9092
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:29092,EXTERNAL://localhost:${KAFKA_PORT}
+
+      # Listener name -> security protocol
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT
+
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER # KRaft controller listener
+
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL # Broker communication
+
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1 # Only one broker
+
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1 # Only one broker
+
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1 # Only one broker
+
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0 # No initial rebalance delay
+
+      KAFKA_NUM_PARTITIONS: 3 # Default partitions for new topics
+
+    volumes:
+      - kafka_data:/var/lib/kafka/data
+
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "/opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server localhost:9092 > /dev/null 2>&1"
+        ]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+
+
+  schema-registry:
+    image: confluentinc/cp-schema-registry:7.9.0
+    container_name: SCHEMA_REGISTRY
+    restart: unless-stopped
+
+    depends_on:
+      kafka:
+        condition: service_healthy
+
+    ports:
+      - "${SCHEMA_REGISTRY_PORT}:8081"
+
+    environment:
+
+      SCHEMA_REGISTRY_HOST_NAME: schema-registry
+
+      SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8081
+
+      # IMPORTANT:
+      #
+      # Schema Registry is inside Docker.
+      #
+      # Use Kafka's INTERNAL address:
+      #   kafka:29092
+      #
+      # But the protocol must be PLAINTEXT,
+      # NOT INTERNAL.
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: PLAINTEXT://kafka:29092
+
+      # _schemas topic is stored in Kafka.
+      # One broker -> replication factor 1.
+      SCHEMA_REGISTRY_KAFKASTORE_TOPIC_REPLICATION_FACTOR: 1
+
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl -f http://localhost:8081/subjects > /dev/null 2>&1"
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: KAFKA_UI
+    restart: unless-stopped
+
+    depends_on:
+      kafka:
+        condition: service_healthy
+
+      schema-registry:
+        condition: service_healthy
+
+    ports:
+      - "${KAFKA_UI_PORT}:8080"
+
+    environment:
+
+      KAFKA_CLUSTERS_0_NAME: local
+
+      # Kafka UI is inside Docker,
+      # so it uses the internal Kafka listener.
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
+
+      # Kafka UI is also inside Docker.
+      KAFKA_CLUSTERS_0_SCHEMAREGISTRY: http://schema-registry:8081
+
+# ==============================================================
+# VOLUMES
+# ==============================================================
 volumes:
   postgres_data:
   redis_data:
+  kafka_data:

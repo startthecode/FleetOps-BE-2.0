@@ -11,7 +11,7 @@ import tools.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
 import tools.jackson.databind.jsontype.PolymorphicTypeValidator;
 
 @Configuration
-public class CacheTemplate {
+public class CacheConf {
     @Bean
     public RedisTemplate<String, Object> redisTemplate (RedisConnectionFactory factory){
         BasicPolymorphicTypeValidator.Builder builder = BasicPolymorphicTypeValidator.builder();

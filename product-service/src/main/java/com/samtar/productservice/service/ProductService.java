@@ -1,6 +1,8 @@
 package com.samtar.productservice.service;
 
 import com.samtar.avro.ProductCreatedEvent;
+import com.samtar.avro.ProductDeletedEvent;
+import com.samtar.avro.ProductUpdatedEvent;
 import com.samtar.consts.ReqHeadersKeys;
 import com.samtar.enums.OutboxStatus;
 import com.samtar.enums.kafkaEvents.ProductEvents;
@@ -17,10 +19,13 @@ import com.samtar.productservice.repository.ProductRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.nio.ByteBuffer;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -38,7 +43,7 @@ public class ProductService {
         }
         ProductEntity newProduct = productMapper.toEntity(payload);
         ProductEntity insertedProduct = productRepository.save(newProduct);
-        generateEventFlow(insertedProduct);
+        generateCreationEvent(insertedProduct);
         return productMapper.toResponse(insertedProduct);
     }
 
@@ -47,9 +52,10 @@ public class ProductService {
         String userID = req.getHeader(ReqHeadersKeys.USER_ID);
         ProductEntity existingProduct = productRepository.findByIdAndSellerId(UUID.fromString(payload.productId()), UUID.fromString(userID)).orElseThrow(() -> new BaseException(MessageConstant.PRODUCT_NOT_FOUND, HttpStatus.NOT_FOUND));
         productMapper.toUpdatedEntity(existingProduct, payload);
-        return productMapper.toResponse(productRepository.save(existingProduct));
+        ProductEntity updatedProduct = productRepository.save(existingProduct);
+        generateUpdateEvent(updatedProduct);
+        return productMapper.toResponse(updatedProduct);
     }
-
 
     @Transactional
     public void deleteProduct(String productId, HttpServletRequest req) {
@@ -61,6 +67,7 @@ public class ProductService {
                 .orElseThrow(() -> new BaseException(MessageConstant.PRODUCT_NOT_FOUND, HttpStatus.NOT_FOUND));
         try {
             productRepository.delete(existingProduct);
+            generateDeletionEvent(existingProduct);
         } catch (Exception e) {
             throw new BaseException(MessageConstant.PRODUCT_NOT_FOUND, HttpStatus.NOT_FOUND);
         }
@@ -73,46 +80,96 @@ public class ProductService {
         return productMapper.toResponse(existingProducts);
     }
 
-
     @Transactional
     public List<ProductRespDto> allProducts(HttpServletRequest req) {
-        String userID = req.getHeader(ReqHeadersKeys.USER_ID);
         List<ProductEntity> existingProducts = productRepository.findAll();
         return productMapper.toResponse(existingProducts);
     }
 
-
     @Transactional
-    private void generateEventFlow(ProductEntity product) {
+    private <T> void outBoxInsertion(ProductEntity product, T payload) {
         try {
-            ProductCreatedEvent event = ProductCreatedEvent.newBuilder()
-                    .setProductId(product.getId().toString())
-                    .setProductName(product.getProductName())
-                    .setDescription(product.getDescription())
-                    .setPrice(
-                            ByteBuffer.wrap(
-                                    product.getSellingPrice()
-                                            .movePointRight(2)
-                                            .toBigIntegerExact()
-                                            .toByteArray()
-                            )
-                    )
-                    .setQuantity(product.getStockQuantity())
-                    .setCategoryId(
-                            product.getCategoryId() != null
-                                    ? product.getCategoryId().toString()
-                                    : null
-                    )
-                    .build();
             OutboxEventEntity evntEntity = new OutboxEventEntity();
             evntEntity.setAggregateId(product.getId());
-            evntEntity.setPayload(String.valueOf(event));
+            evntEntity.setPayload(String.valueOf(payload));
             evntEntity.setTopic(ProductEvents.CREATED.toString());
             evntEntity.setRetryCount(0);
             evntEntity.setStatus(OutboxStatus.PENDING);
+            evntEntity.setCreatedAt(Instant.now());
             outBoxEventRepository.save(evntEntity);
         } catch (Exception e) {
             throw new BaseException(MessageConstant.FAIL_TO_EXECUTE, HttpStatus.CONFLICT);
         }
     }
+
+    private void generateCreationEvent(ProductEntity product) {
+        ProductCreatedEvent event = ProductCreatedEvent.newBuilder()
+                .setProductId(product.getId().toString())
+                .setProductName(product.getProductName())
+                .setDescription(product.getDescription())
+                .setPrice(
+                        ByteBuffer.wrap(
+                                product.getSellingPrice()
+                                        .movePointRight(2)
+                                        .toBigIntegerExact()
+                                        .toByteArray()
+                        )
+                )
+                .setQuantity(product.getStockQuantity())
+                .setCategoryId(
+                        product.getCategoryId() != null
+                                ? product.getCategoryId().toString()
+                                : null
+                )
+                .build();
+        outBoxInsertion(product, event);
+    }
+
+    private void generateUpdateEvent(ProductEntity product) {
+        ProductUpdatedEvent event = ProductUpdatedEvent.newBuilder()
+                .setProductId(product.getId().toString())
+                .setProductName(product.getProductName())
+                .setDescription(product.getDescription())
+                .setPrice(
+                        ByteBuffer.wrap(
+                                product.getSellingPrice()
+                                        .movePointRight(2)
+                                        .toBigIntegerExact()
+                                        .toByteArray()
+                        )
+                )
+                .setQuantity(product.getStockQuantity())
+                .setCategoryId(
+                        product.getCategoryId() != null
+                                ? product.getCategoryId().toString()
+                                : null
+                )
+                .build();
+        outBoxInsertion(product, event);
+    }
+
+    private void generateDeletionEvent(ProductEntity product) {
+        ProductDeletedEvent event = ProductDeletedEvent.newBuilder()
+                .setProductId(product.getId().toString())
+                .setProductName(product.getProductName())
+                .setDescription(product.getDescription())
+                .setPrice(
+                        ByteBuffer.wrap(
+                                product.getSellingPrice()
+                                        .movePointRight(2)
+                                        .toBigIntegerExact()
+                                        .toByteArray()
+                        )
+                )
+                .setQuantity(product.getStockQuantity())
+                .setCategoryId(
+                        product.getCategoryId() != null
+                                ? product.getCategoryId().toString()
+                                : null
+                )
+                .build();
+        outBoxInsertion(product, event);
+    }
+
+
 }

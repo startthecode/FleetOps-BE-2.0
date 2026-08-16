@@ -20,8 +20,8 @@ import java.util.UUID;
                         columnList = "status, created_at"
                 ),
                 @Index(
-                        name = "idx_outbox_aggregate",
-                        columnList = "aggregate_id, aggregate_type"
+                        name = "idx_outbox_status",
+                        columnList = "status"
                 )
         }
 )
@@ -60,6 +60,11 @@ public class OutboxEventEntity {
 
     @Column(name = "published_at")
     private Instant publishedAt;
+
+    // First problem it solves when we have to instance and one has claimed and set status processing and app crashed even will stay
+//    in processing that why we need lock for 5 minutes.
+    @Column(name = "locked_at")
+    private Instant lockedAt;
 
     @Version
     private Long version;
