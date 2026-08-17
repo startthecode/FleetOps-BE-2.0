@@ -87,12 +87,12 @@ public class ProductService {
     }
 
     @Transactional
-    private <T> void outBoxInsertion(ProductEntity product, T payload) {
+    private <T> void outBoxInsertion(ProductEntity product, T payload, ProductEvents eventTopic) {
         try {
             OutboxEventEntity evntEntity = new OutboxEventEntity();
             evntEntity.setAggregateId(product.getId());
             evntEntity.setPayload(String.valueOf(payload));
-            evntEntity.setTopic(ProductEvents.CREATED.toString());
+            evntEntity.setTopic(eventTopic.toString());
             evntEntity.setRetryCount(0);
             evntEntity.setStatus(OutboxStatus.PENDING);
             evntEntity.setCreatedAt(Instant.now());
@@ -122,7 +122,7 @@ public class ProductService {
                                 : null
                 )
                 .build();
-        outBoxInsertion(product, event);
+        outBoxInsertion(product, event, ProductEvents.CREATED);
     }
 
     private void generateUpdateEvent(ProductEntity product) {
@@ -145,7 +145,7 @@ public class ProductService {
                                 : null
                 )
                 .build();
-        outBoxInsertion(product, event);
+        outBoxInsertion(product, event, ProductEvents.UPDATED);
     }
 
     private void generateDeletionEvent(ProductEntity product) {
@@ -168,7 +168,7 @@ public class ProductService {
                                 : null
                 )
                 .build();
-        outBoxInsertion(product, event);
+        outBoxInsertion(product, event, ProductEvents.DELETED);
     }
 
 

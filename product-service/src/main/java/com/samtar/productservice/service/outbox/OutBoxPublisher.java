@@ -45,7 +45,7 @@ public class OutBoxPublisher {
         }
         eventBatch.forEach(e -> {
             kafkaTemplate.send(
-                    ProductEvents.CREATED.toString(),
+                    e.getTopic(),
                     e.getId().toString(),
                     e.getPayload()).whenComplete((d, ex) -> {
                 if (ex == null) {
