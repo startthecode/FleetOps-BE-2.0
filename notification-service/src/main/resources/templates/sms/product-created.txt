@@ -1,0 +1,1 @@
+New product added: {{productName}} (ID {{productId}}), price {{price}}, qty {{quantity}}.

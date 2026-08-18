@@ -1,0 +1,1 @@
+Product removed: {{productName}} (ID {{productId}}).

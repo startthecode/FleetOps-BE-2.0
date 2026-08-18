@@ -36,22 +36,22 @@ spring:
       port: ${REDIS_PORT}
       host: ${REDIS_HOST}
       password: ${REDIS_PASSWORD}
-kafka:
-  bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVER:localhost:9092}
-  producer:
-    key-serializer: org.apache.kafka.common.serialization.StringSerializer
-    value-serializer: io.confluent.kafka.serializers.KafkaAvroSerializer
-    acks: ${KAFKA_PRODUCER_ACKS:all}
-    properties:
-      schema.registry.url: ${AVRO_REGISTRY_URL:http://localhost:8081}
-      linger.ms: ${KAFKA_PRODUCER_LINGER_MS:10}
-      batch.size: ${KAFKA_PRODUCER_BATCH_SIZE:16384}
-      compression.type: ${KAFKA_PRODUCER_BATCH_COMPRESSON_TYPE:snappy}
-      max.in.flight.requests.per.connection: ${KAFKA_PRODUCER_FLIGHT_REQ_PER_CONNECTION:5}
-      retries: ${KAFKA_PRODUCER_RETRIES:3}
-      enable.idempotence: ${KAFKA_PRODUCER_IDIMPOTENCE:true}
-      request.timeout.ms: ${KAFKA_PRODUCER_REQ_TIMEOUT_MS:30000}
-      delivery.timeout.ms: ${KAFKA_PRODUCER_DELIVERY_TIMEOUT_MS:120000}
-      retry.backoff.ms: ${KAFKA_PRODUCER_RETRIES_INTERVAL_MS:100}
-      outbox.interval.ms: ${KAFKA_PRODUCER_OUTBOX_INTERVAL_MS:1000}
-      outbox.batch.size: ${KAFKA_PRODUCER_OUTBOX_BATCH_SIZE:50}
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVER:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: io.confluent.kafka.serializers.KafkaAvroSerializer
+      acks: ${KAFKA_PRODUCER_ACKS:all}
+      properties:
+        schema.registry.url: ${AVRO_REGISTRY_URL:http://localhost:8081}
+        linger.ms: ${KAFKA_PRODUCER_LINGER_MS:10}
+        batch.size: ${KAFKA_PRODUCER_BATCH_SIZE:16384}
+        compression.type: ${KAFKA_PRODUCER_BATCH_COMPRESSON_TYPE:snappy}
+        max.in.flight.requests.per.connection: ${KAFKA_PRODUCER_FLIGHT_REQ_PER_CONNECTION:5}
+        retries: ${KAFKA_PRODUCER_RETRIES:3}
+        enable.idempotence: ${KAFKA_PRODUCER_IDIMPOTENCE:true}
+        request.timeout.ms: ${KAFKA_PRODUCER_REQ_TIMEOUT_MS:30000}
+        delivery.timeout.ms: ${KAFKA_PRODUCER_DELIVERY_TIMEOUT_MS:120000}
+        retry.backoff.ms: ${KAFKA_PRODUCER_RETRIES_INTERVAL_MS:100}
+        outbox.interval.ms: ${KAFKA_PRODUCER_OUTBOX_INTERVAL_MS:1000}
+        outbox.batch.size: ${KAFKA_PRODUCER_OUTBOX_BATCH_SIZE:50}

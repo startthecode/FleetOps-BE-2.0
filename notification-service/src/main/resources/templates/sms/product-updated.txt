@@ -1,0 +1,1 @@
+Product updated: {{productName}} (ID {{productId}}), price {{price}}, qty {{quantity}}.
