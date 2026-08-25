@@ -57,9 +57,6 @@ public record CreateProductReqDto(
                            )
                            Integer reorderLevel,
 
-                           @NotBlank(message = MessageConstant.PRODUCT_SUPPLIER_INVALID_ID)
-                           String sellerId,
-
                            @NotBlank(message = MessageConstant.PRODUCT_UNIT_MANDATORY)
                            @Size(max = 30, message = MessageConstant.PRODUCT_UNIT_MAX_LENGTH)
                            String unit,

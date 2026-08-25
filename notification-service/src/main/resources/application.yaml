@@ -44,6 +44,12 @@ spring:
         schema.registry.url: ${AVRO_REGISTRY_URL:http://localhost:8081}
         specific.avro.reader: true
         group.protocol: consumer
+    # Producer used by the DeadLetterPublishingRecoverer to write failed Avro records to *-dlt.
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: io.confluent.kafka.serializers.KafkaAvroSerializer
+      properties:
+        schema.registry.url: ${AVRO_REGISTRY_URL:http://localhost:8081}
     listener:
       ack-mode: manual
 #    producer:
@@ -71,3 +77,7 @@ notification:
       interval: ${KAFKA_CONSUMER_RETRY_INTERVAL}
       multiplier: ${KAFKA_CONSUMER_RETRY_MULTIPLIER}
       max-duration: ${KAFKA_CONSUMER_MAX_RETRY_DURATION}
+  mail:
+    # Resend API key and sender; recipient comes from each event's `email` field.
+    api-key: ${RESEND_API_KEY}
+    from: ${NOTIFICATION_MAIL_FROM}

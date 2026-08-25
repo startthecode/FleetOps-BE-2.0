@@ -28,8 +28,8 @@ public class ProductPrivateController {
 
     @PostMapping("/create")
     @LowerAuthorityAnnotation
-    public ResponseEntity<SuccessApiResponse<ProductRespDto>> createProduct(@Valid @RequestBody CreateProductReqDto payload) {
-        ProductRespDto newProduct = productService.createProduct(payload);
+    public ResponseEntity<SuccessApiResponse<ProductRespDto>> createProduct(@Valid @RequestBody CreateProductReqDto payload,HttpServletRequest req) {
+        ProductRespDto newProduct = productService.createProduct(payload,req);
         SuccessApiResponse<ProductRespDto> response = new SuccessApiResponse<>(MessageConstant.PRODUCT_CREATED_SUCCESS, newProduct, LocalDateTime.now());
         return ResponseEntity.ok(response);
     }

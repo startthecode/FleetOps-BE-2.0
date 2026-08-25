@@ -46,7 +46,8 @@ public class JwtFilterChain extends OncePerRequestFilter {
         try {
             String authorization = request.getHeader("Authorization");
             if (authorization == null || !authorization.startsWith("Bearer ")) {
-                throw new TokenExceptions(MessageConstant.UNAUTHORIZED_USER, HttpStatus.UNAUTHORIZED);
+                throw new TokenExceptions(MessageConstant.UNAUTHORIZED_USER,
+                        HttpStatus.UNAUTHORIZED);
             }
 
             String accessToken = authorization.substring(7);
@@ -65,6 +66,7 @@ public class JwtFilterChain extends OncePerRequestFilter {
             request.setAttribute("x-userid",decodedToken.userId());
             request.setAttribute("x-sessionid",decodedToken.sessionId());
             request.setAttribute("x-user-role",decodedToken.userRole());
+            request.setAttribute("x-user-email",decodedToken.userRole());
             filterChain.doFilter(request, response);
         } catch (Exception e) {
             exceptionHandling(request, response, e);

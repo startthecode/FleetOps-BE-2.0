@@ -44,8 +44,6 @@ import org.springframework.stereotype.Service;
 public class UserServices {
     record Tokens(String accessToken, String refreshToken) {
     }
-
-    ;
     private final AuthenticationManager authenticationManager;
     private final JwtUtils jwtUtils;
     private final Long accessExpiry;
@@ -136,7 +134,7 @@ public class UserServices {
     }
 
     private Tokens generateTokens(UsersEntity users, String sessionId) {
-        JwtClaimsDto jwtClaimsDto = new JwtClaimsDto(users.getUsername(), users.getRole(), users.getId().toString(),sessionId);
+        JwtClaimsDto jwtClaimsDto = new JwtClaimsDto(users.getUsername(), users.getRole(), users.getId().toString(),sessionId,users.getEmail());
         return new Tokens(
                 jwtUtils.generateToken(TokenTypes.ACCESS_TOKEN, jwtClaimsDto),
                 jwtUtils.generateToken(TokenTypes.REFRESH_TOKEN, jwtClaimsDto)
@@ -208,7 +206,6 @@ public class UserServices {
             throw new RuntimeException(e);
         }
     }
-
 
     @Transactional
     private String createSession(UsersEntity users, Boolean isSignIn) {

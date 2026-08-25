@@ -27,3 +27,7 @@ tmp/
 # OS files
 .DS_Store
 Thumbs.db
+
+# Key material — never commit
+*.pem
+**/keys/*.pem

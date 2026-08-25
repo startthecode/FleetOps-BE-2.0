@@ -14,6 +14,7 @@ public interface ProductMapper {
     @Mapping(ignore = true,target = "createdAt")
     @Mapping(ignore = true,target = "updatedAt")
     @Mapping(ignore = true,target = "version")
+    @Mapping(ignore = true,target = "sellerId")
     ProductEntity toEntity(CreateProductReqDto productReqDto);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)

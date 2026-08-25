@@ -15,7 +15,6 @@ public record ProductRespDto(
         BigDecimal costPrice,
         Integer stockQuantity,
         Integer reorderLevel,
-        String sellerId,
         String unit,
         Boolean active,
         String imageUrl,

@@ -9,6 +9,6 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-@PreAuthorize("hasAuthority('VENDOR')")
+@PreAuthorize("hasAnyAuthority('VENDOR','SUPER_ADMIN')")
 public @interface LowerAuthorityAnnotation {
 }

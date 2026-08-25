@@ -19,6 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
+import java.security.PrivateKey;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HexFormat;
@@ -34,17 +35,20 @@ public class JwtUtils {
     private final Long refreshTokenExpiry;
     private final Long accessTokenExpiry;
 
+    private PrivateKey privateKey;
+
     public JwtUtils(
         @Value("${app.security.jwt.access-token-hex}") String accessKey,
         @Value("${app.security.jwt.refresh-token-hex}") String refreshKey,
         @Value("${app.security.jwt.access-expiry}") Long accessTokenExpiry,
-        @Value("${app.security.jwt.refresh-expiry}") Long refreshTokenExpiry
-
-    ) {
+        @Value("${app.security.jwt.refresh-expiry}") Long refreshTokenExpiry,
+        PrivateKey privateKey
+            ) {
         this.accessKey = toSecretKey(accessKey);
         this.refreshKey = toSecretKey(refreshKey);
         this.accessTokenExpiry = accessTokenExpiry;
         this.refreshTokenExpiry = refreshTokenExpiry;
+        this.privateKey = privateKey;
     }
 
     public String generateToken(TokenTypes tokenType, JwtClaimsDto data) {
@@ -55,7 +59,13 @@ public class JwtUtils {
         claims.put("username", data.username());
         claims.put("userid", data.userId());
         claims.put("sessionId", data.sessionId());
-        return Jwts.builder().signWith(secretKey).claims(claims).expiration(new Date(System.currentTimeMillis() + expiry)).issuedAt(new Date()).compact();
+        claims.put("email", data.email());
+        return Jwts.builder()
+                .claims(claims)
+                .expiration(new Date(System.currentTimeMillis() + expiry))
+                .issuedAt(new Date())
+                .signWith(privateKey, Jwts.SIG.RS256)
+                .compact();
     }
 
     public JwtClaimsDto decodeToken(String token, TokenTypes tokenType) throws Exception {
@@ -75,12 +85,19 @@ public class JwtUtils {
 
 
     private JwtClaimsDto parseClaims(String token, SecretKey key) {
-        Claims data = Jwts.parser().verifyWith(key).build().parseSignedClaims(token).getPayload();
+        Claims data = Jwts.parser()
+                .verifyWith(key)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
         return new JwtClaimsDto(
                 (String) data.get("username"),
                 ROLE.valueOf((String) data.get("role")),
                 (String) data.get("userid"),
-                (String) data.get("sessionId"));
+                (String) data.get("sessionId"),
+                (String) data.get("email")
+        );
+
     }
 
 

@@ -46,29 +46,34 @@ public class ProductService {
     private final OutBoxEventRepository outBoxEventRepository;
 
     @Transactional
-    public ProductRespDto createProduct(CreateProductReqDto payload) {
+    public ProductRespDto createProduct(CreateProductReqDto payload,HttpServletRequest req) {
+        String userID = req.getHeader(ReqHeadersKeys.USER_ID);
+        String email = req.getHeader(ReqHeadersKeys.USER_EMAIL);
         if (productRepository.existsByProductNameIgnoreCaseOrSkuIgnoreCase(payload.productName().trim(), payload.sku().trim())) {
             throw new BaseException(MessageConstant.PRODUCT_ALREADY_EXISTS, HttpStatus.CONFLICT);
         }
         ProductEntity newProduct = productMapper.toEntity(payload);
+        newProduct.setSellerId(UUID.fromString(userID));
         ProductEntity insertedProduct = productRepository.save(newProduct);
-        generateCreationEvent(insertedProduct);
+        generateCreationEvent(insertedProduct,email);
         return productMapper.toResponse(insertedProduct);
     }
 
     @Transactional
     public ProductRespDto updateProduct(UpdateProductReqDto payload, HttpServletRequest req) {
         String userID = req.getHeader(ReqHeadersKeys.USER_ID);
+        String email = req.getHeader(ReqHeadersKeys.USER_EMAIL);
         ProductEntity existingProduct = productRepository.findByIdAndSellerId(UUID.fromString(payload.productId()), UUID.fromString(userID)).orElseThrow(() -> new BaseException(MessageConstant.PRODUCT_NOT_FOUND, HttpStatus.NOT_FOUND));
         productMapper.toUpdatedEntity(existingProduct, payload);
         ProductEntity updatedProduct = productRepository.save(existingProduct);
-        generateUpdateEvent(updatedProduct);
+        generateUpdateEvent(updatedProduct,email);
         return productMapper.toResponse(updatedProduct);
     }
 
     @Transactional
     public void deleteProduct(String productId, HttpServletRequest req) {
         String userID = req.getHeader(ReqHeadersKeys.USER_ID);
+        String email = req.getHeader(ReqHeadersKeys.USER_EMAIL);
         ProductEntity existingProduct = productRepository
                 .findByIdAndSellerId(UUID
                                 .fromString(productId),
@@ -76,7 +81,7 @@ public class ProductService {
                 .orElseThrow(() -> new BaseException(MessageConstant.PRODUCT_NOT_FOUND, HttpStatus.NOT_FOUND));
         try {
             productRepository.delete(existingProduct);
-            generateDeletionEvent(existingProduct);
+            generateDeletionEvent(existingProduct,email);
         } catch (Exception e) {
             throw new BaseException(MessageConstant.PRODUCT_NOT_FOUND, HttpStatus.NOT_FOUND);
         }
@@ -122,12 +127,14 @@ public class ProductService {
         return Base64.getEncoder().encodeToString(out.toByteArray());
     }
 
-    private void generateCreationEvent(ProductEntity product) {
+    private void generateCreationEvent(ProductEntity product,String email) {
         ProductCreatedEvent event = ProductCreatedEvent.newBuilder()
                 .setEventId(UUID.randomUUID().toString())
                 .setProductId(product.getId().toString())
                 .setProductName(product.getProductName())
                 .setDescription(product.getDescription())
+                .setSellerId(product.getSellerId().toString())
+                .setEmail(email)
                 .setPrice(
                         ByteBuffer.wrap(
                                 product.getSellingPrice()
@@ -146,12 +153,15 @@ public class ProductService {
         outBoxInsertion(product, event, KafkaTopics.PRODUCT_CREATED);
     }
 
-    private void generateUpdateEvent(ProductEntity product) {
+    private void generateUpdateEvent(ProductEntity product,String email) {
         ProductUpdatedEvent event = ProductUpdatedEvent.newBuilder()
                 .setProductId(product.getId().toString())
                 .setEventId(UUID.randomUUID().toString())
                 .setProductName(product.getProductName())
                 .setDescription(product.getDescription())
+                .setSellerId(product.getSellerId().toString())
+                .setEmail(email)
+
                 .setPrice(
                         ByteBuffer.wrap(
                                 product.getSellingPrice()
@@ -170,12 +180,15 @@ public class ProductService {
         outBoxInsertion(product, event, KafkaTopics.PRODUCT_UPDATED);
     }
 
-    private void generateDeletionEvent(ProductEntity product) {
+    private void generateDeletionEvent(ProductEntity product,String email) {
         ProductDeletedEvent event = ProductDeletedEvent.newBuilder()
                 .setEventId(UUID.randomUUID().toString())
                 .setProductId(product.getId().toString())
                 .setProductName(product.getProductName())
                 .setDescription(product.getDescription())
+                .setSellerId(product.getSellerId().toString())
+                .setEmail(email)
+
                 .setPrice(
                         ByteBuffer.wrap(
                                 product.getSellingPrice()

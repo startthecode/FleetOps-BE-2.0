@@ -35,6 +35,17 @@
       "type": "int"
     },
     {
+      "name": "sellerId",
+      "type": ["null", "string"],
+      "default": null
+
+    },
+    {
+      "name": "email",
+      "type":  "string"
+    },
+
+    {
       "name": "categoryId",
       "type": ["null", "string"],
       "default": null
