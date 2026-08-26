@@ -1,0 +1,12 @@
+server:
+  port: ${APPLICATION_PORT:8888}
+
+
+spring:
+  config:
+    import:
+      - optional:file:.env[.properties]
+      - optional:file:api-gateway/.env[.properties]
+
+  application:
+      name: ${SPRING_APPLICATION_NAME:api-gateway}
