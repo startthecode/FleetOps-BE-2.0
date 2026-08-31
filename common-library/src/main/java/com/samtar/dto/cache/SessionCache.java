@@ -11,5 +11,4 @@ public record SessionCache(
 ) {
     public SessionCache {
     }
-
 }

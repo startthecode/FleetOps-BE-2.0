@@ -19,7 +19,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
+import java.security.KeyFactory;
 import java.security.PrivateKey;
+import java.security.interfaces.RSAPrivateCrtKey;
+import java.security.interfaces.RSAPublicKey;
+import java.security.spec.RSAPublicKeySpec;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HexFormat;
@@ -36,6 +40,7 @@ public class JwtUtils {
     private final Long accessTokenExpiry;
 
     private PrivateKey privateKey;
+    private  RSAPublicKey publicKey;
 
     public JwtUtils(
         @Value("${app.security.jwt.access-token-hex}") String accessKey,
@@ -49,6 +54,7 @@ public class JwtUtils {
         this.accessTokenExpiry = accessTokenExpiry;
         this.refreshTokenExpiry = refreshTokenExpiry;
         this.privateKey = privateKey;
+        this.publicKey = derivePublicKey((RSAPrivateCrtKey) privateKey);
     }
 
     public String generateToken(TokenTypes tokenType, JwtClaimsDto data) {
@@ -69,9 +75,8 @@ public class JwtUtils {
     }
 
     public JwtClaimsDto decodeToken(String token, TokenTypes tokenType) throws Exception {
-        SecretKey secretKey = TokenTypes.REFRESH_TOKEN == tokenType ? this.refreshKey : this.accessKey;
         try {
-            return parseClaims(token, secretKey);
+            return parseClaims(token);
         } catch (ExpiredJwtException ex) {
             throw new TokenExceptions(MessageConstant.EXPIRED_TOKEN, HttpStatus.UNAUTHORIZED);
         } catch (JwtException ex) {
@@ -84,9 +89,9 @@ public class JwtUtils {
     }
 
 
-    private JwtClaimsDto parseClaims(String token, SecretKey key) {
+    private JwtClaimsDto parseClaims(String token ) {
         Claims data = Jwts.parser()
-                .verifyWith(key)
+                .verifyWith(publicKey)
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
@@ -100,6 +105,14 @@ public class JwtUtils {
 
     }
 
+    private static RSAPublicKey derivePublicKey(RSAPrivateCrtKey pk) {
+        try {
+            return (RSAPublicKey) KeyFactory.getInstance("RSA")
+                    .generatePublic(new RSAPublicKeySpec(pk.getModulus(), pk.getPublicExponent()));
+        } catch (Exception e) {
+            throw new IllegalStateException("Cannot derive RSA public key", e);
+        }
+    }
 
     private SecretKey toSecretKey(String normalKey) {
         byte[] key = HexFormat.of().parseHex(normalKey.trim());

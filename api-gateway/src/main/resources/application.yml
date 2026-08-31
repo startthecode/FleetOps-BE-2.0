@@ -1,12 +1,40 @@
 server:
-  port: ${APPLICATION_PORT:8888}
-
+  port: ${APPLICATION_PORT:9999}
 
 spring:
   config:
     import:
       - optional:file:.env[.properties]
       - optional:file:api-gateway/.env[.properties]
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6380}
+      password: ${REDIS_PASSWORD}
 
   application:
-      name: ${SPRING_APPLICATION_NAME:api-gateway}
+    name: ${SPRING_APPLICATION_NAME:api-gateway}
+
+  cloud:
+    gateway:
+      server:
+        webflux:
+          routes:
+            - id: auth-service
+              uri: http://localhost:1000
+              predicates:
+                - Path=/api/v1/auth/**
+
+            - id: product-service
+              uri: http://localhost:1001
+              predicates:
+                - Path=/api/v1/product/private/**
+app:
+  security:
+    cookie:
+      auth-token:
+        name: ${APP_SECURITY_COOKIE_AUTH_TOKEN_NAME:smtrtkn}
+
+client:
+  userervice:
+    baseurl: http://localhost:1000

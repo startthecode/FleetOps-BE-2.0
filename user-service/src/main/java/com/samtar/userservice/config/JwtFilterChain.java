@@ -43,12 +43,14 @@ public class JwtFilterChain extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
+
         try {
             String authorization = request.getHeader("Authorization");
             if (authorization == null || !authorization.startsWith("Bearer ")) {
                 throw new TokenExceptions(MessageConstant.UNAUTHORIZED_USER,
                         HttpStatus.UNAUTHORIZED);
             }
+            System.out.println(authorization);
 
             String accessToken = authorization.substring(7);
             if (accessToken.isEmpty())

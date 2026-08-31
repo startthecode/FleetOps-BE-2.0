@@ -47,4 +47,10 @@ public static final String FAIL_TO_EXECUTE = "Something went wrong";
   // generic
   public static final String INVALID_PAYLOAD = "Invalid payload.";
   public static final String METHOD_NOT_ALLOWED = "Method not allowed.";
+
+
+
+  // Internal
+  public static final String SESSION_UPDATED = "Session updated successfully";
+
 }

@@ -23,8 +23,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(
                         a->
                                 a.anyRequest()
-                                        .authenticated())
-                .addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class).build();
+                                        .permitAll())
+//                .addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class).build();
+                .build();
     }
 
 }

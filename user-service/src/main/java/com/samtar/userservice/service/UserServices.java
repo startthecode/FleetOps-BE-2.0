@@ -208,6 +208,23 @@ public class UserServices {
     }
 
     @Transactional
+    public Boolean updateOrRejectSession(String sessionID){
+        System.out.println("hhhhh im hgere");
+        String sessionCacheKey = CacheKeys.USER_SESSION + ":" + sessionID;
+        SessionEntity sessionDtl = sessionRepository.findById(UUID.fromString(sessionID)).orElse(null);
+        if(sessionDtl == null) return false;
+        UsersEntity userData = sessionDtl.getUser();
+        cacheService.set(sessionCacheKey,new SessionCache(
+                userData.getUsername(),
+                userData.getEmail(),
+                userData.getRole(),
+                userData.getId()
+        ));
+        return true;
+    }
+
+
+    @Transactional
     private String createSession(UsersEntity users, Boolean isSignIn) {
         if (isSignIn && users.getSessions().size() == maxSessionAttempts) {
             throw new ValidationException(MessageConstant.INVALID_PAYLOAD,
@@ -223,6 +240,9 @@ public class UserServices {
 
         return session.getId().toString();
     }
+
+
+
 
     private void createCacheSession(UsersEntity users, String sessionID) {
         SessionCache cacheForSession = new SessionCache(
