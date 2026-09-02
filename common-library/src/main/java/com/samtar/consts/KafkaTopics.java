@@ -8,6 +8,11 @@ public class KafkaTopics {
     public static final String PRODUCT_DELETED = "product.deleted";
 
 
+    public static final String INVENTORY_CREATED = "invetory.created";
+    public static final String INVENTORY_UPDATED = "invetory.updated";
+    public static final String INVENTORY_DELETED = "invetory.deleted";
+
+
 
 }
 

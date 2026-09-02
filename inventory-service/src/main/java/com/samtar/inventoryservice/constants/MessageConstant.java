@@ -37,6 +37,7 @@ public final class MessageConstant {
 
   public static final String PRODUCT_NOT_FOUND = "Product not found.";
   public static final String WAREHOUSE_NOT_FOUND = "Warehouse not found.";
+  public static final String UNAUTHORIZED_USER = "Unauthorized user.";
 
   // =========================
   // Stock Messages

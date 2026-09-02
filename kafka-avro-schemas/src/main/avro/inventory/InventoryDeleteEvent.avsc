@@ -1,0 +1,20 @@
+{
+  "type": "record",
+  "name": "InventoryDeletedEvent",
+  "namespace": "com.samtar.avro",
+
+  "fields": [
+    {
+      "name": "eventId",
+      "type": "string"
+    },
+    {
+      "name": "warehouseId",
+      "type": "string"
+    },
+    {
+      "name": "productId",
+      "type": "string"
+    }
+  ]
+}

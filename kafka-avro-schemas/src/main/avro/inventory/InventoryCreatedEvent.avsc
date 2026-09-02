@@ -1,0 +1,39 @@
+{
+  "type": "record",
+  "name": "InventoryCreatedEvent",
+  "namespace": "com.samtar.avro",
+  "fields": [
+    {
+      "name": "eventId",
+      "type": "string"
+    },
+    {
+      "name": "warehouseId",
+      "type": "string"
+    },
+    {
+      "name": "productId",
+      "type": "string"
+    },
+    {
+      "name": "quantity",
+      "type": "int"
+    },
+    {
+      "name": "reservedQuantity",
+      "type": [
+        "null",
+        "int"
+      ],
+      "default": null
+    },
+    {
+      "name": "availableQuantity",
+      "type": [
+        "null",
+        "int"
+      ],
+      "default": null
+    }
+  ]
+}

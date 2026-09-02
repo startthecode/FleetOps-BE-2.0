@@ -7,7 +7,7 @@ import com.samtar.inventoryservice.entity.InventoryEntity;
 import org.mapstruct.*;
 
 @Mapper(componentModel = "spring")
-public interface inventoryMapper {
+public interface InventoryMapper {
 
     @BeanMapping(
             nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE
