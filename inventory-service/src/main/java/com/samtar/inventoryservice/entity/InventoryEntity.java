@@ -27,11 +27,11 @@ import java.util.UUID;
 )
 public class InventoryEntity extends BaseEntity {
     @NotNull(message = MessageConstant.PRODUCT_ID_MANDATORY)
-    @Column(nullable = false, unique = true, name = "product_id")
+    @Column(nullable = false, name = "product_id")
     UUID productId;
 
     @NotNull(message = MessageConstant.WAREHOUSE_ID_MANDATORY)
-    @Column(nullable = false, unique = true, name = "warehouse_id")
+    @Column(nullable = false, name = "warehouse_id")
     UUID warehouseId;
 
     @Column(nullable = false, name = "quantity")

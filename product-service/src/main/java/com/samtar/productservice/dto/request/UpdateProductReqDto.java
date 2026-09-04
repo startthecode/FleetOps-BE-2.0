@@ -12,6 +12,9 @@ public record UpdateProductReqDto(
         @NotBlank(message = MessageConstant.PRODUCT_ID_MANDATORY)
         String productId,
 
+        @NotBlank(message = MessageConstant.WAREHOUSE_ID_MANDATORY)
+        String warehouseId,
+
 
         @Size(max = 255, message = MessageConstant.PRODUCT_NAME_MAX_LENGTH)
         String productName,
@@ -41,7 +44,7 @@ public record UpdateProductReqDto(
 
         @DecimalMin(
                 value = "0.0",
-                inclusive = true,
+//                inclusive = true,
                 message = MessageConstant.PRODUCT_COST_PRICE_INVALID
         )
         BigDecimal costPrice,
@@ -100,8 +103,21 @@ public record UpdateProductReqDto(
         Double taxPercentage,
 
         @Size(max = 1000, message = MessageConstant.PRODUCT_NOTES_MAX_LENGTH)
-        String notes
+        String notes,
 
+        @NotNull(message = MessageConstant.PRODUCT_RESERVED_QUANTITY_REQUIRED)
+        @Min(
+                value = 0,
+                message = MessageConstant.PRODUCT_RESERVED_QUANTITY_INVALID
+        )
+        Integer reservedQuantity,
+
+        @NotNull(message = MessageConstant.PRODUCT_AVAILABLE_QUANTITY_REQUIRED)
+        @Min(
+                value = 0,
+                message = MessageConstant.PRODUCT_AVAILABLE_QUANTITY_INVALID
+        )
+        Integer availableQuantity
 ) {
 
 

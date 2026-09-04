@@ -2,7 +2,6 @@
   "type": "record",
   "name": "ProductDeletedEvent",
   "namespace": "com.samtar.avro",
-
   "fields": [
     {
       "name": "eventId",
@@ -16,37 +15,9 @@
       "name": "productName",
       "type": "string"
     },
-    {
-      "name": "description",
-      "type": ["null", "string"],
-      "default": null
-    },
-    {
-      "name": "price",
-      "type": {
-        "type": "bytes",
-        "logicalType": "decimal",
-        "precision": 19,
-        "scale": 2
-      }
-    },
-    {
-      "name": "quantity",
-      "type": "int"
-    },
-    {
-      "name": "sellerId",
-      "type": ["null", "string"],
-      "default": null
-    },
-    {
+   {
       "name": "email",
       "type":  "string"
-    },
-    {
-      "name": "categoryId",
-      "type": ["null", "string"],
-      "default": null
     }
   ]
 }

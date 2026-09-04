@@ -1,7 +1,7 @@
 package com.samtar.inventoryservice.service;
 
-import com.samtar.avro.InventoryCreatedEvent;
-import com.samtar.avro.InventoryDeletedEvent;
+import com.samtar.avro.ProductCreatedEvent;
+import com.samtar.avro.ProductDeletedEvent;
 import com.samtar.consts.KafkaTopics;
 import com.samtar.exception.BaseException;
 import com.samtar.inventoryservice.constants.MessageConstant;
@@ -23,9 +23,9 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class InventoryService {
-    InventoryRepository inventoryRepository;
-    ProcessedEvtRepository processedEvtRepository;
-    InventoryMapper inventoryMapper;
+private  final InventoryRepository inventoryRepository;
+private  final ProcessedEvtRepository processedEvtRepository;
+private  final InventoryMapper inventoryMapper;
 
     @Transactional
     public ResponseDto update(UpdateReqDto updateReqDto) {
@@ -50,9 +50,18 @@ public class InventoryService {
         inventoryRepository.delete(inventoryItem);
         return true;
     }
+    @Transactional
+    public Boolean delete(String productId) {
+        InventoryEntity inventoryItem = inventoryRepository.
+                findByProductId(UUID.fromString(productId))
+                .orElseThrow(() -> new BaseException(MessageConstant.PRODUCT_NOT_FOUND, HttpStatus.CONFLICT));
+        inventoryRepository.delete(inventoryItem);
+        return true;
+    }
 
-    @KafkaListener(topics = KafkaTopics.INVENTORY_CREATED, groupId = "inventory-service-group")
-    private void createInventory(InventoryCreatedEvent inventoryCreatedEvent, Acknowledgment acknowledgements) throws Exception {
+    @KafkaListener(topics = KafkaTopics.PRODUCT_CREATED, groupId = "inventory-service-group")
+    private void createInventory(ProductCreatedEvent inventoryCreatedEvent, Acknowledgment acknowledgements) throws Exception {
+       System.out.println(inventoryCreatedEvent);
         InventoryEntity inventory = new InventoryEntity();
         inventory.setProductId(UUID.fromString(inventoryCreatedEvent.getProductId()));
         inventory.setWarehouseId(UUID.fromString(inventoryCreatedEvent.getWarehouseId()));
@@ -63,14 +72,15 @@ public class InventoryService {
         if (newInventory.productId() != null) {
             acknowledgements.acknowledge();
             return;
-        };
+        }
+        ;
         String exceptionEvent = inventoryCreatedEvent.getEventId() + "failed Creation of Inventory" + inventoryCreatedEvent.toString();
         throw new Exception(exceptionEvent);
     }
 
-    @KafkaListener(topics = KafkaTopics.INVENTORY_DELETED, groupId = "inventory-service-group")
-    private void createInventory(InventoryDeletedEvent inventoryCreatedEvent, Acknowledgment acknowledgements) throws Exception {
-      Boolean deleteInventory = this.delete(inventoryCreatedEvent.getProductId(),inventoryCreatedEvent.getWarehouseId());
+    @KafkaListener(topics = KafkaTopics.PRODUCT_DELETED, groupId = "inventory-service-group")
+    private void deleteInventory(ProductDeletedEvent inventoryCreatedEvent, Acknowledgment acknowledgements) throws Exception {
+        Boolean deleteInventory = this.delete(inventoryCreatedEvent.getProductId());
         if (Boolean.TRUE.equals(deleteInventory)) {
             acknowledgements.acknowledge();
             return;

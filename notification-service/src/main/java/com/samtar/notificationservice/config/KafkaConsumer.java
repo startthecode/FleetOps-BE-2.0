@@ -51,12 +51,10 @@ public class KafkaConsumer {
 
     @Bean
     public ConcurrentKafkaListenerContainerFactory<Object,Object> consumerFactory(ConsumerFactory<Object,Object> consumerFactory,DefaultErrorHandler defaultErrorHandler){
-        ConcurrentKafkaListenerContainerFactory<Object,Object> concurrentKafkaListenerContainerFactory = new ConcurrentKafkaListenerContainerFactory<>();
+        ConcurrentKafkaListenerContainerFactory<Object,Object> concurrentKafkaListenerContainerFactory =
+                new ConcurrentKafkaListenerContainerFactory<>();
             concurrentKafkaListenerContainerFactory.setConcurrency(8);
             concurrentKafkaListenerContainerFactory.setCommonErrorHandler(defaultErrorHandler);
             return  concurrentKafkaListenerContainerFactory;
     }
-
-
-
 }

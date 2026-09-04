@@ -13,6 +13,10 @@
       "type": "string"
     },
     {
+      "name": "warehouseId",
+      "type": "string"
+    },
+    {
       "name": "productName",
       "type": "string"
     },
@@ -32,6 +36,14 @@
     },
     {
       "name": "quantity",
+      "type": "int"
+    },
+    {
+      "name": "reservedQuantity",
+      "type": "int"
+    },
+    {
+      "name": "availableQuantity",
       "type": "int"
     },
     {

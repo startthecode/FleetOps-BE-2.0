@@ -6,7 +6,6 @@ import com.samtar.avro.ProductUpdatedEvent;
 import com.samtar.consts.KafkaTopics;
 import com.samtar.consts.ReqHeadersKeys;
 import com.samtar.enums.OutboxStatus;
-import com.samtar.enums.kafkaEvents.ProductEvents;
 import com.samtar.exception.BaseException;
 import com.samtar.productservice.constants.MessageConstant;
 import com.samtar.productservice.dto.request.CreateProductReqDto;
@@ -24,8 +23,6 @@ import org.apache.avro.io.BinaryEncoder;
 import org.apache.avro.io.EncoderFactory;
 import org.apache.avro.specific.SpecificDatumWriter;
 import org.apache.avro.specific.SpecificRecordBase;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -35,7 +32,6 @@ import java.nio.ByteBuffer;
 import java.time.Instant;
 import java.util.Base64;
 import java.util.List;
-import java.util.Random;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -55,7 +51,7 @@ public class ProductService {
         ProductEntity newProduct = productMapper.toEntity(payload);
         newProduct.setSellerId(UUID.fromString(userID));
         ProductEntity insertedProduct = productRepository.save(newProduct);
-        generateCreationEvent(insertedProduct,email);
+        generateCreationEvent(insertedProduct,email,payload);
         return productMapper.toResponse(insertedProduct);
     }
 
@@ -66,7 +62,7 @@ public class ProductService {
         ProductEntity existingProduct = productRepository.findByIdAndSellerId(UUID.fromString(payload.productId()), UUID.fromString(userID)).orElseThrow(() -> new BaseException(MessageConstant.PRODUCT_NOT_FOUND, HttpStatus.NOT_FOUND));
         productMapper.toUpdatedEntity(existingProduct, payload);
         ProductEntity updatedProduct = productRepository.save(existingProduct);
-        generateUpdateEvent(updatedProduct,email);
+        generateUpdateEvent(updatedProduct,email,payload);
         return productMapper.toResponse(updatedProduct);
     }
 
@@ -94,11 +90,11 @@ public class ProductService {
         return productMapper.toResponse(existingProducts);
     }
 
-    @Transactional
-    public List<ProductRespDto> allProducts(HttpServletRequest req) {
-        List<ProductEntity> existingProducts = productRepository.findAll();
-        return productMapper.toResponse(existingProducts);
-    }
+//    @Transactional
+//    public List<ProductRespDto> allProducts(HttpServletRequest req) {
+//        List<ProductEntity> existingProducts = productRepository.findAll();
+//        return productMapper.toResponse(existingProducts);
+//    }
 
     @Transactional
     private void outBoxInsertion(ProductEntity product, SpecificRecordBase payload, String eventTopic) {
@@ -127,14 +123,15 @@ public class ProductService {
         return Base64.getEncoder().encodeToString(out.toByteArray());
     }
 
-    private void generateCreationEvent(ProductEntity product,String email) {
-        ProductCreatedEvent event = ProductCreatedEvent.newBuilder()
+    private void generateCreationEvent(ProductEntity product,String email,CreateProductReqDto payload) {
+        ProductCreatedEvent event1 = ProductCreatedEvent.newBuilder()
                 .setEventId(UUID.randomUUID().toString())
                 .setProductId(product.getId().toString())
                 .setProductName(product.getProductName())
                 .setDescription(product.getDescription())
                 .setSellerId(product.getSellerId().toString())
                 .setEmail(email)
+                .setWarehouseId(payload.warehouseId())
                 .setPrice(
                         ByteBuffer.wrap(
                                 product.getSellingPrice()
@@ -144,16 +141,21 @@ public class ProductService {
                         )
                 )
                 .setQuantity(product.getStockQuantity())
+                .setAvailableQuantity(payload.availableQuantity())
+                .setReservedQuantity(payload.reservedQuantity())
                 .setCategoryId(
                         product.getCategoryId() != null
                                 ? product.getCategoryId().toString()
                                 : null
                 )
                 .build();
-        outBoxInsertion(product, event, KafkaTopics.PRODUCT_CREATED);
+
+
+
+        outBoxInsertion(product, event1, KafkaTopics.PRODUCT_CREATED);
     }
 
-    private void generateUpdateEvent(ProductEntity product,String email) {
+    private void generateUpdateEvent(ProductEntity product,String email,UpdateProductReqDto payload) {
         ProductUpdatedEvent event = ProductUpdatedEvent.newBuilder()
                 .setProductId(product.getId().toString())
                 .setEventId(UUID.randomUUID().toString())
@@ -161,7 +163,7 @@ public class ProductService {
                 .setDescription(product.getDescription())
                 .setSellerId(product.getSellerId().toString())
                 .setEmail(email)
-
+                .setWarehouseId(payload.warehouseId())
                 .setPrice(
                         ByteBuffer.wrap(
                                 product.getSellingPrice()
@@ -171,6 +173,8 @@ public class ProductService {
                         )
                 )
                 .setQuantity(product.getStockQuantity())
+                .setAvailableQuantity(payload.availableQuantity())
+                .setReservedQuantity(payload.reservedQuantity())
                 .setCategoryId(
                         product.getCategoryId() != null
                                 ? product.getCategoryId().toString()
@@ -185,24 +189,7 @@ public class ProductService {
                 .setEventId(UUID.randomUUID().toString())
                 .setProductId(product.getId().toString())
                 .setProductName(product.getProductName())
-                .setDescription(product.getDescription())
-                .setSellerId(product.getSellerId().toString())
                 .setEmail(email)
-
-                .setPrice(
-                        ByteBuffer.wrap(
-                                product.getSellingPrice()
-                                        .movePointRight(2)
-                                        .toBigIntegerExact()
-                                        .toByteArray()
-                        )
-                )
-                .setQuantity(product.getStockQuantity())
-                .setCategoryId(
-                        product.getCategoryId() != null
-                                ? product.getCategoryId().toString()
-                                : null
-                )
                 .build();
         outBoxInsertion(product, event, KafkaTopics.PRODUCT_DELETED);
     }

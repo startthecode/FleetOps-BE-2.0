@@ -4,10 +4,11 @@ server:
 spring:
   application:
     name: ${SPRING_APPLICATION_NAME:inventory-service}
+
   config:
     import:
       - optional:file:.env[.properties]
-      - optional:file:notification-service/.env[.properties]
+      - optional:file:inventory-service/.env[.properties]
 
   datasource:
     url: ${SPRING_DATASOURCE_URL}
@@ -50,3 +51,7 @@ spring:
         schema.registry.url: ${AVRO_REGISTRY_URL:http://localhost:8081}
     listener:
       ack-mode: manual
+    retry:
+      interval: ${KAFKA_CONSUMER_RETRY_INTERVAL}
+      multiplier: ${KAFKA_CONSUMER_RETRY_MULTIPLIER}
+      max-duration: ${KAFKA_CONSUMER_MAX_RETRY_DURATION}

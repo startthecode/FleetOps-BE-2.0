@@ -102,4 +102,30 @@ public final class MessageConstant {
   // SERVER FAILURES
   public static final String FAIL_TO_EXECUTE = "Something went wrong";
 
+
+  // Inventory
+
+  public static final String WAREHOUSE_ID_MANDATORY = "Warehouse Id is required.";
+
+  public static final String STOCK_QUANTITY_INVALID = "Stock quantity cannot be negative.";
+
+  public static final String RESERVED_QUANTITY_INVALID = "Reserved quantity cannot be negative.";
+
+  public static final String AVAILABLE_QUANTITY_INVALID = "Available quantity cannot be negative.";
+  public static final String PRODUCT_QUANTITY_INVALID =
+          "Product quantity must be greater than or equal to 0";
+
+  public static final String PRODUCT_RESERVED_QUANTITY_INVALID =
+          "Product reserved quantity must be greater than or equal to 0";
+
+  public static final String PRODUCT_AVAILABLE_QUANTITY_INVALID =
+          "Product available quantity must be greater than or equal to 0";
+  public static final String PRODUCT_QUANTITY_REQUIRED =
+          "Product quantity is required";
+
+  public static final String PRODUCT_RESERVED_QUANTITY_REQUIRED =
+          "Product reserved quantity is required";
+
+  public static final String PRODUCT_AVAILABLE_QUANTITY_REQUIRED =
+          "Product available quantity is required";
 }

@@ -17,6 +17,9 @@
       "type": "string"
     },
     {
+      "name": "warehouseId",
+      "type": "string"
+    },{
       "name": "description",
       "type": ["null", "string"],
       "default": null
@@ -35,16 +38,22 @@
       "type": "int"
     },
     {
+      "name": "reservedQuantity",
+      "type": "int"
+    },
+    {
+      "name": "availableQuantity",
+      "type": "int"
+    },
+    {
       "name": "sellerId",
       "type": ["null", "string"],
       "default": null
-
     },
     {
       "name": "email",
       "type":  "string"
     },
-
     {
       "name": "categoryId",
       "type": ["null", "string"],

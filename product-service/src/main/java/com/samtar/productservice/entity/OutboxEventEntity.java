@@ -38,7 +38,6 @@ public class OutboxEventEntity {
     @Column(name = "aggregate_id", nullable = false)
     private UUID aggregateId;
 
-
     @Column(nullable = false, columnDefinition = "TEXT")
     private String payload;
 
@@ -62,7 +61,7 @@ public class OutboxEventEntity {
     private Instant publishedAt;
 
     // First problem it solves when we have to instance and one has claimed and set status processing and app crashed even will stay
-//    in processing that why we need lock for 5 minutes.
+//   In processing that why we need lock for 5 minutes.
     @Column(name = "locked_at")
     private Instant lockedAt;
 
