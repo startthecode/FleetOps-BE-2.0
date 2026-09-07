@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.Instant;
+import java.util.UUID;
 
 @Entity
 @Getter
@@ -21,8 +22,7 @@ public class ProcessedEventsEntity {
 //    @SequenceGenerator(name = "processed_id_seq",allocationSize = 30,sequenceName = "processed_id_seq" )
     @Id
     @Column(nullable = false, unique = true, name = "event_id")
-    @NotNull()
-    Long eventId;
+    UUID eventId;
 
     @Column(name = "event_type")
     String eventType;

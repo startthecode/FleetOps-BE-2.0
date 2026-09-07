@@ -8,6 +8,7 @@ import com.samtar.inventoryservice.constants.MessageConstant;
 import com.samtar.inventoryservice.dto.request.UpdateReqDto;
 import com.samtar.inventoryservice.dto.response.ResponseDto;
 import com.samtar.inventoryservice.entity.InventoryEntity;
+import com.samtar.inventoryservice.entity.ProcessedEventsEntity;
 import com.samtar.inventoryservice.mapper.InventoryMapper;
 import com.samtar.inventoryservice.repository.InventoryRepository;
 import com.samtar.inventoryservice.repository.ProcessedEvtRepository;
@@ -18,14 +19,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class InventoryService {
-private  final InventoryRepository inventoryRepository;
-private  final ProcessedEvtRepository processedEvtRepository;
-private  final InventoryMapper inventoryMapper;
+    private final InventoryRepository inventoryRepository;
+    private final ProcessedEvtRepository processedEvtRepository;
+    private final InventoryMapper inventoryMapper;
 
     @Transactional
     public ResponseDto update(UpdateReqDto updateReqDto) {
@@ -42,6 +44,32 @@ private  final InventoryMapper inventoryMapper;
         return inventoryMapper.toResponse(inventoryRepository.save(inventoryEntity));
     }
 
+
+    @Transactional
+    public InventoryEntity create(ProductCreatedEvent productCreatedEvent) {
+        try {
+            InventoryEntity inventory = new InventoryEntity();
+            inventory.setProductId(UUID.fromString(productCreatedEvent.getProductId()));
+            inventory.setWarehouseId(UUID.fromString(productCreatedEvent.getWarehouseId()));
+            inventory.setQuantity(productCreatedEvent.getQuantity());
+            inventory.setReservedQuantity(productCreatedEvent.getReservedQuantity());
+            inventory.setAvailableQuantity(productCreatedEvent.getAvailableQuantity());
+            ProcessedEventsEntity processedEventsEntity = new ProcessedEventsEntity();
+            processedEventsEntity.setEventId(UUID.fromString(productCreatedEvent.getEventId()));
+            processedEventsEntity.setEventType(KafkaTopics.PRODUCT_CREATED);
+            processedEventsEntity.setProcessedAt(Instant.now());
+            InventoryEntity resp = inventoryRepository.save(inventory);
+            processedEvtRepository.save(processedEventsEntity);
+            return resp;
+        } catch (Exception e) {
+            System.out.println("------------------------");
+            System.out.println(e);
+            System.out.println("------------------------");
+            throw new BaseException(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+    }
+
     @Transactional
     public Boolean delete(String productId, String wareHouseId) {
         InventoryEntity inventoryItem = inventoryRepository.
@@ -50,6 +78,7 @@ private  final InventoryMapper inventoryMapper;
         inventoryRepository.delete(inventoryItem);
         return true;
     }
+
     @Transactional
     public Boolean delete(String productId) {
         InventoryEntity inventoryItem = inventoryRepository.
@@ -59,23 +88,21 @@ private  final InventoryMapper inventoryMapper;
         return true;
     }
 
+    @Transactional
     @KafkaListener(topics = KafkaTopics.PRODUCT_CREATED, groupId = "inventory-service-group")
-    private void createInventory(ProductCreatedEvent inventoryCreatedEvent, Acknowledgment acknowledgements) throws Exception {
-       System.out.println(inventoryCreatedEvent);
-        InventoryEntity inventory = new InventoryEntity();
-        inventory.setProductId(UUID.fromString(inventoryCreatedEvent.getProductId()));
-        inventory.setWarehouseId(UUID.fromString(inventoryCreatedEvent.getWarehouseId()));
-        inventory.setQuantity(inventory.getQuantity());
-        inventory.setReservedQuantity(inventory.getReservedQuantity());
-        inventory.setAvailableQuantity(inventory.getAvailableQuantity());
-        ResponseDto newInventory = this.create(inventory);
-        if (newInventory.productId() != null) {
+    public void createInventory(ProductCreatedEvent inventoryCreatedEvent, Acknowledgment acknowledgements) throws Exception {
+        try {
+            if (processedEvtRepository.existsByEventId(UUID.fromString(inventoryCreatedEvent.getEventId()))) {
+                acknowledgements.acknowledge();
+                return;
+            }
+            this.create(inventoryCreatedEvent);
             acknowledgements.acknowledge();
-            return;
+        } catch (Exception e) {
+            System.out.println(e);
+            throw new BaseException(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+
         }
-        ;
-        String exceptionEvent = inventoryCreatedEvent.getEventId() + "failed Creation of Inventory" + inventoryCreatedEvent.toString();
-        throw new Exception(exceptionEvent);
     }
 
     @KafkaListener(topics = KafkaTopics.PRODUCT_DELETED, groupId = "inventory-service-group")

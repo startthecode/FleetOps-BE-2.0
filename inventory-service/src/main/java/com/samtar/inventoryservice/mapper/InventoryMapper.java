@@ -16,6 +16,6 @@ public interface InventoryMapper {
     @Mapping(ignore = true, target = "warehouseId")
     void updateEntity(UpdateReqDto updateReqDto, @MappingTarget InventoryEntity inventoryEntity);
 
-    @Mapping(ignore = true, target = "productId")
+//    @Mapping(ignore = true, target = "productId")
     ResponseDto toResponse(InventoryEntity entity);
 }
