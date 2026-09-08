@@ -1,4 +1,4 @@
-package com.samtar.productservice.config;
+package com.samtar.inventoryservice.config;
 
 
 import lombok.RequiredArgsConstructor;

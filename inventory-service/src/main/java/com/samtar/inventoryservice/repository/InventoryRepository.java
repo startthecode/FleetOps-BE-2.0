@@ -7,5 +7,6 @@ import java.util.UUID;
 
 public interface InventoryRepository extends JpaRepository<InventoryEntity,Long> {
     Optional<InventoryEntity> findByProductIdAndWarehouseId(UUID productId,UUID warehouseID);
+    Optional<InventoryEntity> findByProductIdAndWarehouseIdAndSellerId(UUID productId,UUID warehouseID,UUID sellerID);
     Optional<InventoryEntity> findByProductId(UUID productId);
 }

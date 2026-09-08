@@ -3,6 +3,7 @@ package com.samtar.inventoryservice.service;
 import com.samtar.avro.ProductCreatedEvent;
 import com.samtar.avro.ProductDeletedEvent;
 import com.samtar.consts.KafkaTopics;
+import com.samtar.consts.ReqHeadersKeys;
 import com.samtar.exception.BaseException;
 import com.samtar.inventoryservice.constants.MessageConstant;
 import com.samtar.inventoryservice.dto.request.UpdateReqDto;
@@ -12,6 +13,7 @@ import com.samtar.inventoryservice.entity.ProcessedEventsEntity;
 import com.samtar.inventoryservice.mapper.InventoryMapper;
 import com.samtar.inventoryservice.repository.InventoryRepository;
 import com.samtar.inventoryservice.repository.ProcessedEvtRepository;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.support.Acknowledgment;
@@ -28,6 +30,17 @@ public class InventoryService {
     private final InventoryRepository inventoryRepository;
     private final ProcessedEvtRepository processedEvtRepository;
     private final InventoryMapper inventoryMapper;
+
+    @Transactional
+    public ResponseDto update(UpdateReqDto updateReqDto, HttpServletRequest req) {
+        String sellerId = req.getHeader(ReqHeadersKeys.USER_ID);
+        InventoryEntity inventoryItem = inventoryRepository.
+                findByProductIdAndWarehouseIdAndSellerId(UUID.fromString(updateReqDto.productId()), UUID.fromString(updateReqDto.warehouseId()), UUID.fromString(sellerId))
+                .orElseThrow(() -> new BaseException(MessageConstant.PRODUCT_NOT_FOUND, HttpStatus.CONFLICT));
+        inventoryMapper.updateEntity(updateReqDto, inventoryItem);
+        inventoryRepository.save(inventoryItem);
+        return inventoryMapper.toResponse(inventoryItem);
+    }
 
     @Transactional
     public ResponseDto update(UpdateReqDto updateReqDto) {
@@ -52,6 +65,7 @@ public class InventoryService {
             inventory.setProductId(UUID.fromString(productCreatedEvent.getProductId()));
             inventory.setWarehouseId(UUID.fromString(productCreatedEvent.getWarehouseId()));
             inventory.setQuantity(productCreatedEvent.getQuantity());
+            inventory.setSellerId(UUID.fromString(productCreatedEvent.getSellerId()));
             inventory.setReservedQuantity(productCreatedEvent.getReservedQuantity());
             inventory.setAvailableQuantity(productCreatedEvent.getAvailableQuantity());
             ProcessedEventsEntity processedEventsEntity = new ProcessedEventsEntity();
@@ -80,11 +94,17 @@ public class InventoryService {
     }
 
     @Transactional
-    public Boolean delete(String productId) {
+    public Boolean delete(ProductDeletedEvent productDeletedEvent) {
         InventoryEntity inventoryItem = inventoryRepository.
-                findByProductId(UUID.fromString(productId))
-                .orElseThrow(() -> new BaseException(MessageConstant.PRODUCT_NOT_FOUND, HttpStatus.CONFLICT));
+                findByProductId(UUID.fromString(productDeletedEvent.getProductId()))
+                .orElse(null);
+        if (inventoryItem == null) return false;
         inventoryRepository.delete(inventoryItem);
+        ProcessedEventsEntity processedEventsEntity = new ProcessedEventsEntity();
+        processedEventsEntity.setEventId(UUID.fromString(productDeletedEvent.getEventId()));
+        processedEventsEntity.setEventType(KafkaTopics.PRODUCT_DELETED);
+        processedEventsEntity.setProcessedAt(Instant.now());
+        processedEvtRepository.save(processedEventsEntity);
         return true;
     }
 
@@ -99,21 +119,26 @@ public class InventoryService {
             this.create(inventoryCreatedEvent);
             acknowledgements.acknowledge();
         } catch (Exception e) {
-            System.out.println(e);
             throw new BaseException(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 
         }
     }
 
+    @Transactional
     @KafkaListener(topics = KafkaTopics.PRODUCT_DELETED, groupId = "inventory-service-group")
-    private void deleteInventory(ProductDeletedEvent inventoryCreatedEvent, Acknowledgment acknowledgements) throws Exception {
-        Boolean deleteInventory = this.delete(inventoryCreatedEvent.getProductId());
-        if (Boolean.TRUE.equals(deleteInventory)) {
+    public void deleteInventory(ProductDeletedEvent inventoryDeleteEvent, Acknowledgment acknowledgements) throws Exception {
+        try {
+            if (processedEvtRepository.existsByEventId(UUID.fromString(inventoryDeleteEvent.getEventId()))) {
+                acknowledgements.acknowledge();
+                return;
+            }
+            this.delete(inventoryDeleteEvent);
             acknowledgements.acknowledge();
-            return;
+        } catch (Exception e) {
+            throw new BaseException(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        String exceptionEvent = inventoryCreatedEvent.getEventId() + "failed Deletion of Inventory" + inventoryCreatedEvent.toString();
-        throw new Exception(exceptionEvent);
+
+
     }
 
 }

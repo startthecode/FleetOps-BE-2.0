@@ -30,6 +30,10 @@ public class InventoryEntity extends BaseEntity {
     @Column(nullable = false, name = "product_id")
     UUID productId;
 
+    @Column(nullable = false)
+    @NotNull(message = MessageConstant.PRODUCT_SUPPLIER_INVALID_ID)
+    private UUID sellerId;
+
     @NotNull(message = MessageConstant.WAREHOUSE_ID_MANDATORY)
     @Column(nullable = false, name = "warehouse_id")
     UUID warehouseId;

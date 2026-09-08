@@ -19,6 +19,7 @@ import com.samtar.productservice.repository.ProductRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.avro.io.BinaryEncoder;
 import org.apache.avro.io.EncoderFactory;
 import org.apache.avro.specific.SpecificDatumWriter;
@@ -34,6 +35,7 @@ import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class ProductService {
@@ -60,7 +62,7 @@ public class ProductService {
         String userID = req.getHeader(ReqHeadersKeys.USER_ID);
         String email = req.getHeader(ReqHeadersKeys.USER_EMAIL);
         ProductEntity existingProduct = productRepository.findByIdAndSellerId(UUID.fromString(payload.productId()), UUID.fromString(userID)).orElseThrow(() -> new BaseException(MessageConstant.PRODUCT_NOT_FOUND, HttpStatus.NOT_FOUND));
-        productMapper.toUpdatedEntity(existingProduct, payload);
+    productMapper.toUpdatedEntity(existingProduct, payload);
         ProductEntity updatedProduct = productRepository.save(existingProduct);
         generateUpdateEvent(updatedProduct,email,payload);
         return productMapper.toResponse(updatedProduct);
@@ -70,6 +72,7 @@ public class ProductService {
     public void deleteProduct(String productId, HttpServletRequest req) {
         String userID = req.getHeader(ReqHeadersKeys.USER_ID);
         String email = req.getHeader(ReqHeadersKeys.USER_EMAIL);
+        log.info("{} {} {}",userID,email,productId);
         ProductEntity existingProduct = productRepository
                 .findByIdAndSellerId(UUID
                                 .fromString(productId),
@@ -140,7 +143,7 @@ public class ProductService {
                                         .toByteArray()
                         )
                 )
-                .setQuantity(product.getStockQuantity())
+                .setQuantity(payload.quantity())
                 .setAvailableQuantity(payload.availableQuantity())
                 .setReservedQuantity(payload.reservedQuantity())
                 .setCategoryId(
@@ -172,7 +175,7 @@ public class ProductService {
                                         .toByteArray()
                         )
                 )
-                .setQuantity(product.getStockQuantity())
+                .setQuantity(payload.quantity())
                 .setAvailableQuantity(payload.availableQuantity())
                 .setReservedQuantity(payload.reservedQuantity())
                 .setCategoryId(

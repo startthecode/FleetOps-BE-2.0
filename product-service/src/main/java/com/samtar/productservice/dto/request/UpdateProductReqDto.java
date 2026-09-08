@@ -105,6 +105,13 @@ public record UpdateProductReqDto(
         @Size(max = 1000, message = MessageConstant.PRODUCT_NOTES_MAX_LENGTH)
         String notes,
 
+        @NotNull(message = MessageConstant.PRODUCT_QUANTITY_REQUIRED)
+        @Min(
+                value = 0,
+                message = MessageConstant.PRODUCT_QUANTITY_INVALID
+        )
+        Integer quantity,
+
         @NotNull(message = MessageConstant.PRODUCT_RESERVED_QUANTITY_REQUIRED)
         @Min(
                 value = 0,

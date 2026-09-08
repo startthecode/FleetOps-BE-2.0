@@ -3,6 +3,7 @@ package com.samtar.productservice.controller;
 
 import com.samtar.dto.SuccessApiResponse;
 import com.samtar.productservice.annotation.LowerAuthorityAnnotation;
+import com.samtar.productservice.annotation.MasterLevelAuthorityAnnotation;
 import com.samtar.productservice.constants.MessageConstant;
 import com.samtar.productservice.dto.request.CreateProductReqDto;
 import com.samtar.productservice.dto.request.UpdateProductReqDto;
@@ -58,7 +59,7 @@ public class ProductPrivateController {
     }
 
     @GetMapping("/master/all")
-    @LowerAuthorityAnnotation
+    @MasterLevelAuthorityAnnotation
     public ResponseEntity<SuccessApiResponse<List<ProductRespDto>>> getAllProduct(HttpServletRequest request) {
         SuccessApiResponse<List<ProductRespDto>> response = new SuccessApiResponse<>(MessageConstant.PRODUCT_CREATED_SUCCESS, productService.allProductsByUser(request), LocalDateTime.now());
         return ResponseEntity.ok(response);

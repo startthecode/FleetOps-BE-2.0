@@ -2,6 +2,7 @@ package com.samtar.apigateway.config;
 
 import com.samtar.apigateway.constants.MessageConstant;
 import com.samtar.apigateway.dto.JwtClaimsDto;
+import com.samtar.consts.ReqHeadersKeys;
 import com.samtar.consts.Routes;
 import com.samtar.dto.ExceptionApiResponse;
 import com.samtar.exception.BaseException;
@@ -51,7 +52,7 @@ public class JwtGlobalFilter implements GlobalFilter, Ordered {
         String authorization = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
         String accessToken = extractBearerToken(authorization);
         if (accessToken == null) {
-           return exceptionResponse(exchange, MessageConstant.INVALID_TOKEN,HttpStatus.UNAUTHORIZED);
+            return exceptionResponse(exchange, MessageConstant.INVALID_TOKEN, HttpStatus.UNAUTHORIZED);
         }
 
         // cookie token
@@ -66,15 +67,15 @@ public class JwtGlobalFilter implements GlobalFilter, Ordered {
                 : null;
 
         if (cookieToken == null || cookieToken.isBlank()) {
-            return exceptionResponse(exchange, MessageConstant.UNAUTHORIZED_USER,HttpStatus.UNAUTHORIZED);
+            return exceptionResponse(exchange, MessageConstant.UNAUTHORIZED_USER, HttpStatus.UNAUTHORIZED);
         }
 
-        return jwtValidationService.validateTokens(accessToken,cookieToken).flatMap(e->
-                forwardAuthenticatedRequest(exchange,chain,e)).onErrorResume(BaseException.class, ex-> exceptionResponse(
+        return jwtValidationService.validateTokens(accessToken, cookieToken).flatMap(e ->
+                forwardAuthenticatedRequest(exchange, chain, e)).onErrorResume(BaseException.class, ex -> exceptionResponse(
                 null,
                 ex.getMessage(),
                 (HttpStatus) ex.getStatusCode()
-        ) ).onErrorResume(Exception.class,ex-> exceptionResponse(
+        )).onErrorResume(Exception.class, ex -> exceptionResponse(
                 exchange,
                 MessageConstant.INVALID_TOKEN,
                 HttpStatus.UNAUTHORIZED
@@ -90,18 +91,24 @@ public class JwtGlobalFilter implements GlobalFilter, Ordered {
                 .mutate()
                 .headers(headers -> {
                     // Remove client-supplied identity headers
-                    headers.remove("X-User-Id");
-                    headers.remove("X-Username");
-                    headers.remove("X-Email");
-                    headers.remove("X-Role");
-                    headers.remove("X-Session-Id");
+                    String userId = ReqHeadersKeys.USER_ID;
+                    String username = ReqHeadersKeys.USER_USERNAME;
+                    String email = ReqHeadersKeys.USER_EMAIL;
+                    String role = ReqHeadersKeys.USER_ROLE;
+                    String sessionId = ReqHeadersKeys.USER_SESSION_ID;
+
+                    headers.remove(userId);
+                    headers.remove(username);
+                    headers.remove(email);
+                    headers.remove(role);
+                    headers.remove(sessionId);
 
                     // Add trusted values from validated JWT
-                    headers.set("X-User-Id", user.userId());
-                    headers.set("X-Username", user.username());
-                    headers.set("X-Email", user.email());
-                    headers.set("X-Role", user.userRole().toString());
-                    headers.set("X-Session-Id", user.sessionId());
+                    headers.set(userId, user.userId());
+                    headers.set(username, user.username());
+                    headers.set(email, user.email());
+                    headers.set(role, user.userRole().toString());
+                    headers.set(sessionId, user.sessionId());
                 })
                 .build();
 
@@ -163,7 +170,6 @@ public class JwtGlobalFilter implements GlobalFilter, Ordered {
             return Mono.error(e);
         }
     }
-
 
 
 }

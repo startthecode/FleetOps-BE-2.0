@@ -20,6 +20,7 @@ public final class MessageConstant {
   public static final String MAXIMUM_STOCK_LEVEL_INVALID = "Maximum stock level cannot be negative.";
   public static final String RESERVED_QUANTITY_INVALID = "Reserved quantity cannot be negative.";
   public static final String AVAILABLE_QUANTITY_INVALID = "Available quantity cannot be negative.";
+  public static final String PRODUCT_SUPPLIER_INVALID_ID = "Invalid seller id";
 
   public static final String INVENTORY_STATUS_MANDATORY = "Inventory status is required.";
   public static final String INVENTORY_LOCATION_MANDATORY = "Inventory location is required.";

@@ -40,8 +40,7 @@ public class AuthFilter extends OncePerRequestFilter {
         try {
             String userID = request.getHeader(ReqHeadersKeys.USER_ID);
             String role = request.getHeader(ReqHeadersKeys.USER_ROLE);
-            System.out.println(userID);
-            System.out.println(role);
+
             if (userID == null || role == null) {
                 throw new SessionException(MessageConstant.UNAUTHORIZED_USER, HttpStatus.UNAUTHORIZED);
             }
