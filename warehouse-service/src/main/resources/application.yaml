@@ -1,0 +1,5 @@
+Server:
+  port:1004
+spring:
+  application:
+    name: warehouse-service
