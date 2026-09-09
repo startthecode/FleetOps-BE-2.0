@@ -1,11 +1,11 @@
-package com.samtar.productservice.exceptions;
+package com.samtar.inventoryservice.exceptions;
 
 
 import com.samtar.dto.ExceptionApiResponse;
 import com.samtar.dto.ValidationErrorResponse;
 import com.samtar.exception.BaseException;
 import com.samtar.exception.ValidationException;
-import com.samtar.productservice.constants.MessageConstant;
+import com.samtar.inventoryservice.constants.MessageConstant;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;

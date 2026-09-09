@@ -16,12 +16,12 @@ public record UpdateReqDto(
         String warehouseId,
 
         @Min(value = 0, message = MessageConstant.STOCK_QUANTITY_INVALID)
-        int quantity,
+        Integer quantity,
 
         @Min(value = 0, message = MessageConstant.RESERVED_QUANTITY_INVALID)
-        int reservedQuantity,
+        Integer reservedQuantity,
 
         @Min(value = 0, message = MessageConstant.AVAILABLE_QUANTITY_INVALID)
-        int availableQuantity
+        Integer availableQuantity
 ) {
 }

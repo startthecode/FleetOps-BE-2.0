@@ -32,7 +32,7 @@ public class InventoryService {
     private final InventoryMapper inventoryMapper;
 
     @Transactional
-    public ResponseDto update(UpdateReqDto updateReqDto, HttpServletRequest req) {
+    public synchronized ResponseDto update(UpdateReqDto updateReqDto, HttpServletRequest req) {
         String sellerId = req.getHeader(ReqHeadersKeys.USER_ID);
         InventoryEntity inventoryItem = inventoryRepository.
                 findByProductIdAndWarehouseIdAndSellerId(UUID.fromString(updateReqDto.productId()), UUID.fromString(updateReqDto.warehouseId()), UUID.fromString(sellerId))
@@ -43,7 +43,7 @@ public class InventoryService {
     }
 
     @Transactional
-    public ResponseDto update(UpdateReqDto updateReqDto) {
+    public synchronized ResponseDto update(UpdateReqDto updateReqDto) {
         InventoryEntity inventoryItem = inventoryRepository.
                 findByProductIdAndWarehouseId(UUID.fromString(updateReqDto.productId()), UUID.fromString(updateReqDto.warehouseId()))
                 .orElseThrow(() -> new BaseException(MessageConstant.PRODUCT_NOT_FOUND, HttpStatus.CONFLICT));
@@ -76,9 +76,7 @@ public class InventoryService {
             processedEvtRepository.save(processedEventsEntity);
             return resp;
         } catch (Exception e) {
-            System.out.println("------------------------");
             System.out.println(e);
-            System.out.println("------------------------");
             throw new BaseException(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 

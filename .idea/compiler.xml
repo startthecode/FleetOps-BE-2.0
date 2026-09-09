@@ -10,11 +10,11 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="common-library" />
         <module name="api-gateway" />
+        <module name="common-library" />
         <module name="kafka-avro-schemas" />
       </profile>
-      <profile name="Annotation profile for inventory-service" enabled="true">
+      <profile name="Annotation profile for warehouse-service" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
@@ -26,6 +26,7 @@
         <module name="product-service" />
         <module name="inventory-service" />
         <module name="user-service" />
+        <module name="warehouse-service" />
         <module name="notification-service" />
       </profile>
     </annotationProcessing>
@@ -44,6 +45,7 @@
       <module name="product-service" options="-parameters" />
       <module name="redis-cache" options="-parameters" />
       <module name="user-service" options="-parameters" />
+      <module name="warehouse-service" options="-parameters" />
     </option>
   </component>
 </project>

@@ -21,7 +21,7 @@ import java.time.LocalDateTime;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/v1/inventory/update")
+@RequestMapping("/api/v1/inventory")
 public class InventoryController {
     private final InventoryService inventoryService;
 

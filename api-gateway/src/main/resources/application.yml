@@ -29,6 +29,11 @@ spring:
               uri: http://localhost:1001
               predicates:
                 - Path=/api/v1/product/private/**
+
+            - id: inventory-service
+              uri: http://localhost:1003
+              predicates:
+                - Path=/api/v1/inventory/**
 app:
   security:
     cookie:
