@@ -2,4 +2,64 @@ Server:
   port:1004
 spring:
   application:
-    name: warehouse-service
+    name: ${SPRING_APPLICATION_NAME:inventory-service}
+  import:
+    - optional:file:.env[.properties]
+    - optional:file:inventory-service/.env[.properties]
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+    driver-class-name: ${SPRING_DATASOURCE_DRIVER_CLASS_NAME:org.postgresql.Driver}
+
+  flyway:
+    enabled: false
+    baseline-on-migrate: true
+    locations: classpath:db/migration
+    validate-on-migrate: true
+
+  jpa:
+    database-platform: ${SPRING_JPA_DATABASE_PLATFORM:org.hibernate.dialect.PostgreSQLDialect}
+    hibernate:
+      ddl-auto: update
+    show-sql: ${SPRING_JPA_SHOW_SQL:false}
+    properties:
+      hibernate:
+        format_sql: ${SPRING_JPA_PROPERTIES_HIBERNATE_FORMAT_SQL:true}
+
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVER:localhost:9092}
+    consumer:
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: io.confluent.kafka.serializers.KafkaAvroDeserializer
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+      properties:
+        schema.registry.url: ${AVRO_REGISTRY_URL:http://localhost:8081}
+        specific.avro.reader: true
+        group.protocol: consumer
+
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: io.confluent.kafka.serializers.KafkaAvroSerializer
+      acks: ${KAFKA_PRODUCER_ACKS:all}
+      properties:
+        schema.registry.url: ${AVRO_REGISTRY_URL:http://localhost:8081}
+        linger.ms: ${KAFKA_PRODUCER_LINGER_MS:10}
+        batch.size: ${KAFKA_PRODUCER_BATCH_SIZE:16384}
+        compression.type: ${KAFKA_PRODUCER_BATCH_COMPRESSON_TYPE:snappy}
+        max.in.flight.requests.per.connection: ${KAFKA_PRODUCER_FLIGHT_REQ_PER_CONNECTION:5}
+        retries: ${KAFKA_PRODUCER_RETRIES:3}
+        enable.idempotence: ${KAFKA_PRODUCER_IDIMPOTENCE:true}
+        request.timeout.ms: ${KAFKA_PRODUCER_REQ_TIMEOUT_MS:30000}
+        delivery.timeout.ms: ${KAFKA_PRODUCER_DELIVERY_TIMEOUT_MS:120000}
+        retry.backoff.ms: ${KAFKA_PRODUCER_RETRIES_INTERVAL_MS:100}
+        outbox.interval.ms: ${KAFKA_PRODUCER_OUTBOX_INTERVAL_MS:1000}
+      listener:
+        ack-mode: manual
+      retry:
+        interval: ${KAFKA_CONSUMER_RETRY_INTERVAL}
+        multiplier: ${KAFKA_CONSUMER_RETRY_MULTIPLIER}
+        max-duration: ${KAFKA_CONSUMER_MAX_RETRY_DURATION}
+
+
