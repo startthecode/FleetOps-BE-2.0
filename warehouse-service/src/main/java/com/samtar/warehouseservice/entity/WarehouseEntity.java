@@ -57,14 +57,6 @@ public class WarehouseEntity extends BaseEntity {
     @NotBlank(message = MessageConstant.CITY_MANDATORY)
     private UUID city;
 
-    @Column(nullable = false, length = 100)
-    @NotBlank(message = MessageConstant.STATE_MANDATORY)
-    private UUID state;
-
-    @Column(nullable = false, length = 100)
-    @NotBlank(message = MessageConstant.COUNTRY_MANDATORY)
-    private UUID country;
-
     @Column(name = "postal_code", nullable = false, length = 20)
     @NotBlank(message = MessageConstant.POSTAL_CODE_MANDATORY)
     private String postalCode;

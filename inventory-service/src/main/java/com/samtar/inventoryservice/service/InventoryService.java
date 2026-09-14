@@ -13,6 +13,7 @@ import com.samtar.inventoryservice.entity.ProcessedEventsEntity;
 import com.samtar.inventoryservice.mapper.InventoryMapper;
 import com.samtar.inventoryservice.repository.InventoryRepository;
 import com.samtar.inventoryservice.repository.ProcessedEvtRepository;
+import com.samtar.inventoryservice.repository.WarehouseRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +31,7 @@ public class InventoryService {
     private final InventoryRepository inventoryRepository;
     private final ProcessedEvtRepository processedEvtRepository;
     private final InventoryMapper inventoryMapper;
+    private final WarehouseRepository warehouseRepository;
 
     @Transactional
     public synchronized ResponseDto update(UpdateReqDto updateReqDto, HttpServletRequest req) {
@@ -61,6 +63,8 @@ public class InventoryService {
     @Transactional
     public InventoryEntity create(ProductCreatedEvent productCreatedEvent) {
         try {
+            boolean warehouseExists = warehouseRepository.existsByWarehouseId(UUID.fromString(productCreatedEvent.getWarehouseId()));
+            if (!warehouseExists) throw new BaseException(MessageConstant.WAREHOUSE_NOT_FOUND, HttpStatus.NOT_FOUND);
             InventoryEntity inventory = new InventoryEntity();
             inventory.setProductId(UUID.fromString(productCreatedEvent.getProductId()));
             inventory.setWarehouseId(UUID.fromString(productCreatedEvent.getWarehouseId()));
@@ -76,7 +80,8 @@ public class InventoryService {
             processedEvtRepository.save(processedEventsEntity);
             return resp;
         } catch (Exception e) {
-            System.out.println(e);
+            if (e instanceof BaseException)
+                throw new BaseException(e.getMessage(), ((BaseException) e).getStatusCode());
             throw new BaseException(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 

@@ -1,11 +1,13 @@
-Server:
-  port:1004
+server:
+  port: 1004
+
 spring:
+  config:
+    import:
+      - optional:file:.env[.properties]
+      - optional:file:warehouse-service/.env[.properties]
   application:
-    name: ${SPRING_APPLICATION_NAME:inventory-service}
-  import:
-    - optional:file:.env[.properties]
-    - optional:file:inventory-service/.env[.properties]
+    name: ${SPRING_APPLICATION_NAME:warehouse-service}
   datasource:
     url: ${SPRING_DATASOURCE_URL}
     username: ${SPRING_DATASOURCE_USERNAME}
@@ -57,9 +59,9 @@ spring:
         outbox.interval.ms: ${KAFKA_PRODUCER_OUTBOX_INTERVAL_MS:1000}
       listener:
         ack-mode: manual
-      retry:
-        interval: ${KAFKA_CONSUMER_RETRY_INTERVAL}
-        multiplier: ${KAFKA_CONSUMER_RETRY_MULTIPLIER}
-        max-duration: ${KAFKA_CONSUMER_MAX_RETRY_DURATION}
+    retry:
+      interval: ${KAFKA_CONSUMER_RETRY_INTERVAL}
+      multiplier: ${KAFKA_CONSUMER_RETRY_MULTIPLIER}
+      max-duration: ${KAFKA_CONSUMER_MAX_RETRY_DURATION}
 
 
