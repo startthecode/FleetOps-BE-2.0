@@ -32,34 +32,6 @@ public class WarehouseController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @PostMapping("/update")
-    @LowerAuthorityAnnotation
-    public ResponseEntity<SuccessApiResponse<WarehouseRespDto>> updateWarehouse(@Valid @RequestBody UpdateWarehouseReqDto payload, HttpServletRequest req) {
-        SuccessApiResponse<WarehouseRespDto> response = new SuccessApiResponse<>(MessageConstant.WAREHOUSE_UPDATED_SUCCESS, warehouseService.update(payload, req), LocalDateTime.now());
-        return ResponseEntity.ok(response);
-    }
-
-    @DeleteMapping("/delete/{warehouseId}")
-    @LowerAuthorityAnnotation
-    public ResponseEntity<SuccessApiResponse<Null>> deleteWarehouse(@PathVariable String warehouseId, HttpServletRequest req) {
-        warehouseService.delete(warehouseId, req);
-        SuccessApiResponse<Null> response = new SuccessApiResponse<>(MessageConstant.WAREHOUSE_DELETED_SUCCESS, null, LocalDateTime.now());
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(response);
-    }
-
-    @GetMapping("/{warehouseId}")
-    @LowerAuthorityAnnotation
-    public ResponseEntity<SuccessApiResponse<WarehouseRespDto>> getWarehouse(@PathVariable String warehouseId, HttpServletRequest req) {
-        SuccessApiResponse<WarehouseRespDto> response = new SuccessApiResponse<>(MessageConstant.WAREHOUSE_FETCHED_SUCCESS, warehouseService.findById(warehouseId, req), LocalDateTime.now());
-        return ResponseEntity.ok(response);
-    }
-
-    @GetMapping("/all")
-    @LowerAuthorityAnnotation
-    public ResponseEntity<SuccessApiResponse<List<WarehouseRespDto>>> getWarehousesByUser(HttpServletRequest req) {
-        SuccessApiResponse<List<WarehouseRespDto>> response = new SuccessApiResponse<>(MessageConstant.WAREHOUSE_FETCHED_SUCCESS, warehouseService.allWarehousesByUser(req), LocalDateTime.now());
-        return ResponseEntity.ok(response);
-    }
 
     @PostMapping("/master/update")
     @MasterLevelAuthorityAnnotation

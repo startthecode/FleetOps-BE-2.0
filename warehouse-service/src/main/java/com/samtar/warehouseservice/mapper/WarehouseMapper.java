@@ -15,7 +15,6 @@ public interface WarehouseMapper {
     @Mapping(ignore = true, target = "createdAt")
     @Mapping(ignore = true, target = "updatedAt")
     @Mapping(ignore = true, target = "version")
-    @Mapping(ignore = true, target = "sellerId")
     WarehouseEntity toEntity(CreateWarehouseReqDto warehouseReqDto);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
@@ -23,7 +22,6 @@ public interface WarehouseMapper {
     @Mapping(ignore = true, target = "createdAt")
     @Mapping(ignore = true, target = "updatedAt")
     @Mapping(ignore = true, target = "version")
-    @Mapping(ignore = true, target = "sellerId")
     void toUpdatedEntity(@MappingTarget WarehouseEntity warehouse, UpdateWarehouseReqDto payload);
 
     WarehouseRespDto toResponse(WarehouseEntity warehouseEntity);

@@ -36,8 +36,8 @@ import java.util.List;
 import java.util.UUID;
 
 @Slf4j
-@RequiredArgsConstructor
 @Service
+@RequiredArgsConstructor
 public class ProductService {
     private final ProductRepository productRepository;
     private final ProductMapper productMapper;
@@ -72,7 +72,6 @@ public class ProductService {
     public void deleteProduct(String productId, HttpServletRequest req) {
         String userID = req.getHeader(ReqHeadersKeys.USER_ID);
         String email = req.getHeader(ReqHeadersKeys.USER_EMAIL);
-        log.info("{} {} {}",userID,email,productId);
         ProductEntity existingProduct = productRepository
                 .findByIdAndSellerId(UUID
                                 .fromString(productId),

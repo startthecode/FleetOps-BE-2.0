@@ -8,7 +8,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface WarehouseRepository extends JpaRepository<WarehouseEntity, UUID> {
-    List<WarehouseEntity> findBySellerId(UUID seller_id);
-    Optional<WarehouseEntity> findByIdAndSellerId(UUID id, UUID seller_id);
-    Boolean existsBySellerIdAndCodeIgnoreCase(UUID seller_id, String code);
+    List<WarehouseEntity> findByCode(String seller_id);
+    boolean existsByCode(String seller_id);
 }

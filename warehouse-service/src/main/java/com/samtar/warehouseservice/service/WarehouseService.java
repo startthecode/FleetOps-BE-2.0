@@ -28,41 +28,25 @@ public class WarehouseService {
 
     @Transactional
     public WarehouseRespDto create(CreateWarehouseReqDto payload, HttpServletRequest req) {
-        UUID sellerId = sellerId(req);
-        if (warehouseRepository.existsBySellerIdAndCodeIgnoreCase(sellerId, payload.code().trim())) {
+        if (warehouseRepository.existsByCode(payload.code())) {
             throw new BaseException(MessageConstant.WAREHOUSE_CODE_ALREADY_EXISTS, HttpStatus.CONFLICT);
         }
+
         WarehouseEntity newWarehouse = warehouseMapper.toEntity(payload);
-        newWarehouse.setSellerId(sellerId);
-        newWarehouse.setCode(payload.code().trim());
+        newWarehouse.setCity(UUID.fromString(payload.city()));
         return warehouseMapper.toResponse(warehouseRepository.save(newWarehouse));
     }
 
-    @Transactional
-    public WarehouseRespDto update(UpdateWarehouseReqDto payload, HttpServletRequest req) {
-        UUID sellerId = sellerId(req);
-        WarehouseEntity existingWarehouse = warehouseRepository
-                .findByIdAndSellerId(UUID.fromString(payload.warehouseId()), sellerId)
-                .orElseThrow(() -> new BaseException(MessageConstant.WAREHOUSE_NOT_FOUND, HttpStatus.NOT_FOUND));
-        return applyUpdate(existingWarehouse, payload);
-    }
 
     @Transactional
     public WarehouseRespDto update(UpdateWarehouseReqDto payload) {
         WarehouseEntity existingWarehouse = warehouseRepository
                 .findById(UUID.fromString(payload.warehouseId()))
                 .orElseThrow(() -> new BaseException(MessageConstant.WAREHOUSE_NOT_FOUND, HttpStatus.NOT_FOUND));
-        return applyUpdate(existingWarehouse, payload);
+        warehouseMapper.toUpdatedEntity(existingWarehouse, payload);
+        return warehouseMapper.toResponse(warehouseRepository.save(existingWarehouse));
     }
 
-    @Transactional
-    public void delete(String warehouseId, HttpServletRequest req) {
-        UUID sellerId = sellerId(req);
-        WarehouseEntity existingWarehouse = warehouseRepository
-                .findByIdAndSellerId(UUID.fromString(warehouseId), sellerId)
-                .orElseThrow(() -> new BaseException(MessageConstant.WAREHOUSE_NOT_FOUND, HttpStatus.NOT_FOUND));
-        warehouseRepository.delete(existingWarehouse);
-    }
 
     @Transactional
     public void delete(String warehouseId) {
@@ -72,14 +56,6 @@ public class WarehouseService {
         warehouseRepository.delete(existingWarehouse);
     }
 
-    @Transactional
-    public WarehouseRespDto findById(String warehouseId, HttpServletRequest req) {
-        UUID sellerId = sellerId(req);
-        WarehouseEntity existingWarehouse = warehouseRepository
-                .findByIdAndSellerId(UUID.fromString(warehouseId), sellerId)
-                .orElseThrow(() -> new BaseException(MessageConstant.WAREHOUSE_NOT_FOUND, HttpStatus.NOT_FOUND));
-        return warehouseMapper.toResponse(existingWarehouse);
-    }
 
     @Transactional
     public WarehouseRespDto findById(String warehouseId) {
@@ -89,33 +65,11 @@ public class WarehouseService {
         return warehouseMapper.toResponse(existingWarehouse);
     }
 
-    @Transactional
-    public List<WarehouseRespDto> allWarehousesByUser(HttpServletRequest req) {
-        return warehouseMapper.toResponse(warehouseRepository.findBySellerId(sellerId(req)));
-    }
 
     @Transactional
     public List<WarehouseRespDto> allWarehouses() {
         return warehouseMapper.toResponse(warehouseRepository.findAll());
     }
 
-    // Code is part of uk_warehouse_code, so a code change needs the uniqueness re-check.
-    private WarehouseRespDto applyUpdate(WarehouseEntity warehouse, UpdateWarehouseReqDto payload) {
-        if (payload.code() != null
-                && !payload.code().trim().equalsIgnoreCase(warehouse.getCode())
-                && warehouseRepository.existsBySellerIdAndCodeIgnoreCase(warehouse.getSellerId(), payload.code().trim())) {
-            throw new BaseException(MessageConstant.WAREHOUSE_CODE_ALREADY_EXISTS, HttpStatus.CONFLICT);
-        }
-        warehouseMapper.toUpdatedEntity(warehouse, payload);
-        if (payload.code() != null) warehouse.setCode(payload.code().trim());
-        return warehouseMapper.toResponse(warehouseRepository.save(warehouse));
-    }
 
-    private UUID sellerId(HttpServletRequest req) {
-        String userID = req.getHeader(ReqHeadersKeys.USER_ID);
-        if (userID == null) {
-            throw new BaseException(MessageConstant.SELLER_ID_INVALID, HttpStatus.UNAUTHORIZED);
-        }
-        return UUID.fromString(userID);
-    }
 }

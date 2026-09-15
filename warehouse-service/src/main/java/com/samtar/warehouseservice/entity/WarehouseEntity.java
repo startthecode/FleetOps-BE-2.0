@@ -21,28 +21,22 @@ import java.util.UUID;
 @NoArgsConstructor
 @Table(name = "warehouses",
         indexes = {
-                @Index(name = "idx_warehouse_seller_id", columnList = "seller_id"),
                 @Index(name = "idx_warehouse_city", columnList = "city")
         },
         uniqueConstraints = {
                 @UniqueConstraint(
                         name = "uk_warehouse_code",
-                        columnNames = {"seller_id", "code"}
+                        columnNames = {"code"}
                 )
         }
 )
 public class WarehouseEntity extends BaseEntity {
 
-    // UUID of User Service
-    @Column(name = "seller_id", nullable = false)
-    @NotNull(message = MessageConstant.SELLER_ID_INVALID)
-    private UUID sellerId;
-
     @Column(nullable = false, length = 150)
     @NotBlank(message = MessageConstant.WAREHOUSE_NAME_MANDATORY)
     private String name;
 
-    @Column(nullable = false, length = 50)
+    @Column(nullable = false, length = 50,unique = true)
     @NotBlank(message = MessageConstant.WAREHOUSE_CODE_MANDATORY)
     private String code;
 
@@ -54,7 +48,7 @@ public class WarehouseEntity extends BaseEntity {
     private String addressLine2;
 
     @Column(nullable = false, length = 100)
-    @NotBlank(message = MessageConstant.CITY_MANDATORY)
+    @NotNull(message = MessageConstant.CITY_MANDATORY)
     private UUID city;
 
     @Column(name = "postal_code", nullable = false, length = 20)
@@ -71,4 +65,18 @@ public class WarehouseEntity extends BaseEntity {
     @DecimalMax(value = "180.0", message = MessageConstant.LONGITUDE_INVALID)
     private BigDecimal longitude;
 
+
+    @Override
+    public String toString() {
+        return "WarehouseEntity{" +
+                "addressLine1='" + addressLine1 + '\'' +
+                ", name='" + name + '\'' +
+                ", code='" + code + '\'' +
+                ", addressLine2='" + addressLine2 + '\'' +
+                ", city=" + city +
+                ", postalCode='" + postalCode + '\'' +
+                ", latitude=" + latitude +
+                ", longitude=" + longitude +
+                '}';
+    }
 }

@@ -32,14 +32,6 @@ public record CreateWarehouseReqDto(
         @Size(max = 100, message = MessageConstant.CITY_MAX_LENGTH)
         String city,
 
-        @NotBlank(message = MessageConstant.STATE_MANDATORY)
-        @Size(max = 100, message = MessageConstant.STATE_MAX_LENGTH)
-        String state,
-
-        @NotBlank(message = MessageConstant.COUNTRY_MANDATORY)
-        @Size(max = 100, message = MessageConstant.COUNTRY_MAX_LENGTH)
-        String country,
-
         @NotBlank(message = MessageConstant.POSTAL_CODE_MANDATORY)
         @Size(max = 20, message = MessageConstant.POSTAL_CODE_MAX_LENGTH)
         String postalCode,
@@ -50,13 +42,8 @@ public record CreateWarehouseReqDto(
 
         @DecimalMin(value = "-180.0", message = MessageConstant.LONGITUDE_INVALID)
         @DecimalMax(value = "180.0", message = MessageConstant.LONGITUDE_INVALID)
-        BigDecimal longitude,
+        BigDecimal longitude
 
-        Status status
 ) {
 
-    public CreateWarehouseReqDto {
-
-        status = status == null ? Status.ACTIVE : status;
-    }
 }

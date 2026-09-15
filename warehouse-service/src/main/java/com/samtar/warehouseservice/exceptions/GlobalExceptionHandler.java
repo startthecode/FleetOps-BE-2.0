@@ -6,6 +6,8 @@ import com.samtar.dto.ValidationErrorResponse;
 import com.samtar.exception.BaseException;
 import com.samtar.exception.ValidationException;
 import com.samtar.warehouseservice.constants.MessageConstant;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +21,8 @@ import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(BaseException.class)
     public ResponseEntity<ExceptionApiResponse<String>> handleBaseExceptions(BaseException exceptionB) {
@@ -45,6 +49,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ExceptionApiResponse<String>> handleGlobalError(Exception err) {
         System.out.println("Error: " + err.getMessage());
+        GlobalExceptionHandler.log.error("Error: " + err);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(new ExceptionApiResponse<>(null, MessageConstant.FAIL_TO_EXECUTE, LocalDateTime.now()));
     }
