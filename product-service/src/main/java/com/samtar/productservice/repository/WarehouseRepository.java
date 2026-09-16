@@ -1,6 +1,6 @@
-package com.samtar.inventoryservice.repository;
+package com.samtar.productservice.repository;
 
-import com.samtar.inventoryservice.entity.referenceEntity.WarehouseEntity;
+import com.samtar.productservice.entity.referenceEntity.WarehouseEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.UUID;

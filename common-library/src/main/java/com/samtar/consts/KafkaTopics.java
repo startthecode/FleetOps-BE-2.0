@@ -13,6 +13,11 @@ public class KafkaTopics {
     public static final String INVENTORY_DELETED = "invetory.deleted";
 
 
+   public static final String WAREHOUSE_CREATED = "warehouse.created";
+   public static final String WAREHOUSE_UPDATED = "warehouse.updated";
+   public static final String WAREHOUSE_DELETED = "warehouse.deleted";
+
+
 
 }
 

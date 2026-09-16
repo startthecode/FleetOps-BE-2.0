@@ -1,0 +1,15 @@
+{
+  "type": "record",
+  "name": "WarehouseCreatedEvent",
+  "namespace": "com.samtar.avro",
+  "fields": [
+    {
+      "name": "eventId",
+      "type": "string"
+    },
+    {
+      "name": "warehouseId",
+      "type": "string"
+    }
+    ]
+}

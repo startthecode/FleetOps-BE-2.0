@@ -32,11 +32,7 @@ public record UpdateWarehouseReqDto(
         @Size(max = 100, message = MessageConstant.CITY_MAX_LENGTH)
         String city,
 
-        @Size(max = 100, message = MessageConstant.STATE_MAX_LENGTH)
-        String state,
 
-        @Size(max = 100, message = MessageConstant.COUNTRY_MAX_LENGTH)
-        String country,
 
         @Size(max = 20, message = MessageConstant.POSTAL_CODE_MAX_LENGTH)
         String postalCode,

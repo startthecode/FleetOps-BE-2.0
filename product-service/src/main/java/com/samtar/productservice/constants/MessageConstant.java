@@ -33,6 +33,7 @@ public final class MessageConstant {
   public static final String PRODUCT_IN_USE = "Product cannot be deleted because it is in use.";
   public static final String PRODUCT_OUT_OF_STOCK = "Product is out of stock.";
   public static final String INSUFFICIENT_STOCK = "Insufficient stock available.";
+  public static final String WAREHOUSE_NOT_FOUND = "Invalid Warehouse id";
 
   // =========================
   // Success Messages
