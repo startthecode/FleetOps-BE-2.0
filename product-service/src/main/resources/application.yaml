@@ -38,6 +38,16 @@ spring:
       password: ${REDIS_PASSWORD}
   kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVER:localhost:9092}
+    consumer:
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: io.confluent.kafka.serializers.KafkaAvroDeserializer
+      auto-offset-reset: earliest
+      # Manual acknowledgment
+      enable-auto-commit: false
+      properties:
+        schema.registry.url: ${AVRO_REGISTRY_URL:http://localhost:8081}
+        specific.avro.reader: true
+        group.protocol: consumer
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: io.confluent.kafka.serializers.KafkaAvroSerializer
@@ -55,3 +65,9 @@ spring:
         retry.backoff.ms: ${KAFKA_PRODUCER_RETRIES_INTERVAL_MS:100}
         outbox.interval.ms: ${KAFKA_PRODUCER_OUTBOX_INTERVAL_MS:1000}
         outbox.batch.size: ${KAFKA_PRODUCER_OUTBOX_BATCH_SIZE:50}
+    listener:
+      ack-mode: manual
+    retry:
+      interval: ${KAFKA_CONSUMER_RETRY_INTERVAL}
+      multiplier: ${KAFKA_CONSUMER_RETRY_MULTIPLIER}
+      max-duration: ${KAFKA_CONSUMER_MAX_RETRY_DURATION}

@@ -1,7 +1,7 @@
 package com.samtar.productservice.entity.referenceEntity;
 
 
-import com.samtar.inventoryservice.constants.MessageConstant;
+import com.samtar.productservice.constants.MessageConstant;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -24,5 +24,4 @@ public class WarehouseEntity {
 
     @CreationTimestamp
     LocalDateTime createdAt;
-
 }

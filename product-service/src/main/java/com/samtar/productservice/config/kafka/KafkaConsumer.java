@@ -1,4 +1,4 @@
-package com.samtar.inventoryservice.config.kafka;
+package com.samtar.productservice.config.kafka;
 
 
 import lombok.RequiredArgsConstructor;
