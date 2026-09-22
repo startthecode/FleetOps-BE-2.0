@@ -1,0 +1,16 @@
+package com.samtar.locationservice;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import java.util.TimeZone;
+
+@SpringBootApplication
+public class LocationServiceApplication {
+
+    public static void main(String[] args) {
+        TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+        SpringApplication.run(LocationServiceApplication.class, args);
+    }
+
+}
