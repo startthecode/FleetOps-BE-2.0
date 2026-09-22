@@ -14,7 +14,7 @@
         <module name="common-library" />
         <module name="kafka-avro-schemas" />
       </profile>
-      <profile name="Annotation profile for warehouse-service" enabled="true">
+      <profile name="Annotation profile for location-service" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
@@ -27,6 +27,7 @@
         <module name="inventory-service" />
         <module name="user-service" />
         <module name="warehouse-service" />
+        <module name="location-service" />
         <module name="notification-service" />
       </profile>
     </annotationProcessing>
@@ -41,6 +42,7 @@
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="api-gateway" options="-parameters" />
       <module name="inventory-service" options="-parameters" />
+      <module name="location-service" options="-parameters" />
       <module name="notification-service" options="-parameters" />
       <module name="product-service" options="-parameters" />
       <module name="redis-cache" options="-parameters" />
