@@ -1,0 +1,15 @@
+{
+  "type": "record",
+  "name": "CityDeletedEvent",
+  "namespace": "com.samtar.avro",
+  "fields": [
+    {
+      "name": "eventId",
+      "type": "string"
+    },
+    {
+      "name": "CityId",
+      "type": "string"
+    }
+  ]
+}

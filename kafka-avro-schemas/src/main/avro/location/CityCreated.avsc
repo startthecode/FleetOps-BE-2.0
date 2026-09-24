@@ -1,0 +1,15 @@
+{
+  "type": "record",
+  "name": "CityCreatedEvent",
+  "namespace": "com.samtar.avro",
+  "fields": [
+    {
+      "name": "eventId",
+      "type": "string"
+    },
+    {
+      "name": "cityId",
+      "type": "string"
+    }
+    ]
+}

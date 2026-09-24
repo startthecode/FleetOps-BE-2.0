@@ -18,6 +18,8 @@ public class KafkaTopics {
    public static final String WAREHOUSE_DELETED = "warehouse.deleted";
 
 
+    public static final String CITY_CREATED = "city.created";
+    public static final String CITY_DELETED = "city.deleted";
 
 }
 
