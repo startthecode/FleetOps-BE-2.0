@@ -14,6 +14,6 @@ public class Topics {
     }
     @Bean
     public NewTopic cityDeleted(){
-        return TopicBuilder.name(KafkaTopics.CITY_CREATED).partitions(8).replicas(2).build();
+        return TopicBuilder.name(KafkaTopics.CITY_DELETED).partitions(8).replicas(2).build();
     }
 }

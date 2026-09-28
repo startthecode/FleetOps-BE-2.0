@@ -2,12 +2,14 @@ package com.samtar.locationservice.service;
 
 
 import com.samtar.avro.CityCreatedEvent;
+import com.samtar.avro.CityDeletedEvent;
 import com.samtar.consts.KafkaTopics;
 import com.samtar.enums.OutboxStatus;
 import com.samtar.enums.Status;
 import com.samtar.locationservice.entity.CityEntity;
 import com.samtar.locationservice.entity.OutboxEventEntity;
 import com.samtar.locationservice.repository.OutboxEventRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.apache.avro.Schema;
 import org.apache.avro.io.BinaryDecoder;
@@ -21,10 +23,8 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.time.Instant;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -33,7 +33,7 @@ public class OutBoxEventService {
     private final KafkaTemplate<String, Object> template;
     private static final Map<String, Schema> TOPIC_SCHEMAS = Map.of(
             KafkaTopics.CITY_CREATED, CityCreatedEvent.getClassSchema(),
-            KafkaTopics.CITY_DELETED, CityCreatedEvent.getClassSchema()
+            KafkaTopics.CITY_DELETED, CityDeletedEvent.getClassSchema()
     );
 
 
@@ -52,7 +52,7 @@ public class OutBoxEventService {
     public void publishEvent() {
         List<OutboxEventEntity> eventList = claimEvents();
         eventList.forEach(e -> {
-            template.send(e.getTopic(), e.getId().toString(), decodeAvro(e.getPayload(), e.getPayload()))
+            template.send(e.getTopic(), e.getId().toString(), decodeAvro(e.getTopic(), e.getPayload()))
                     .whenComplete((success, err) -> {
                         if (err != null) {
                             updateStatus(e, OutboxStatus.FAILED);
@@ -72,6 +72,24 @@ public class OutBoxEventService {
             outboxEvent.setStatus(OutboxStatus.FAILED);
         }
         outboxEventRepository.save(outboxEvent);
+    }
+
+    @Transactional
+    public void recoverLockedEvents() {
+        Instant timeout = Instant.now().minus(10, ChronoUnit.MINUTES);
+        List<OutboxEventEntity> stuck =
+                outboxEventRepository.findByStatusAndLockedAtBefore(
+                        OutboxStatus.PROCESSING,
+                        timeout
+                );
+        if (stuck.isEmpty()) {
+            return;
+        }
+        stuck.forEach(event -> {
+            event.setStatus(OutboxStatus.PENDING);
+            event.setLockedAt(null);
+        });
+        outboxEventRepository.saveAll(stuck);
     }
 
     private static SpecificRecordBase decodeAvro(String topic, String base64Payload) {

@@ -39,6 +39,11 @@ spring:
               uri: http://localhost:1004
               predicates:
                 - Path=/api/v1/warehouse/**
+
+            - id: location-service
+              uri: http://localhost:1005
+              predicates:
+                - Path=/api/v1/location/state/**,/api/v1/location/city/**,/api/v1/location/country/**
 app:
   security:
     cookie:
