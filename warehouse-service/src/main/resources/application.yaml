@@ -64,4 +64,7 @@ spring:
       multiplier: ${KAFKA_CONSUMER_RETRY_MULTIPLIER}
       max-duration: ${KAFKA_CONSUMER_MAX_RETRY_DURATION}
 
+  client:
+    location:
+      baseurl:http://localhost:1005
 
