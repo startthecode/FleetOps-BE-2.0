@@ -1,5 +1,6 @@
 package com.samtar.warehouseservice.config.client;
 
+import com.samtar.consts.ReqHeadersKeys;
 import com.samtar.warehouseservice.client.LocationClient;
 
 import org.apache.hc.client5.http.config.RequestConfig;
@@ -13,6 +14,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.support.RestClientAdapter;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 
 @Configuration
@@ -21,9 +24,7 @@ public class Config {
     @Bean
     public LocationClient locationClient() {
 
-        /*
-         * 1. Connection pool
-         */
+
         var connectionManager =
                 PoolingHttpClientConnectionManagerBuilder
                         .create()
@@ -31,10 +32,6 @@ public class Config {
                         .setMaxConnPerRoute(20)
                         .build();
 
-
-        /*
-         * 2. HTTP timeout configuration
-         */
         RequestConfig requestConfig =
                 RequestConfig.custom()
 
@@ -56,54 +53,53 @@ public class Config {
 
                         .build();
 
-
-        /*
-         * 3. Apache HttpClient
-         */
         CloseableHttpClient httpClient =
                 HttpClients.custom()
                         .setConnectionManager(connectionManager)
                         .setDefaultRequestConfig(requestConfig)
                         .build();
 
-
-        /*
-         * 4. Give Apache HttpClient to Spring
-         */
         HttpComponentsClientHttpRequestFactory requestFactory =
                 new HttpComponentsClientHttpRequestFactory(httpClient);
 
-
-        /*
-         * 5. Spring RestClient
-         */
         RestClient restClient =
                 RestClient.builder()
                         .baseUrl("http://location-service")
                         .requestFactory(requestFactory)
+                        .requestInterceptor((req, body, execution) -> {
+                            // Forward headers
+                            String userid =
+                                    RequestContextHolder.getRequestAttributes() != null
+                                            ? ((ServletRequestAttributes)
+                                            RequestContextHolder.getRequestAttributes())
+                                            .getRequest()
+                                            .getHeader(ReqHeadersKeys.USER_ID)
+                                            : null;
+                            String userRole =
+                                    RequestContextHolder.getRequestAttributes() != null
+                                            ? ((ServletRequestAttributes)
+                                            RequestContextHolder.getRequestAttributes())
+                                            .getRequest()
+                                            .getHeader(ReqHeadersKeys.USER_ROLE)
+                                            : null;
+                            if (userid != null && userRole != null) {
+                                req.getHeaders().set(ReqHeadersKeys.USER_ID, userid);
+                                req.getHeaders().set(ReqHeadersKeys.USER_ROLE, userRole);
+                            }
+                            return execution.execute(req, body);
+                        })
                         .build();
 
-
-        /*
-         * 6. Adapt RestClient
-         *    for Spring HTTP Service Client
-         */
         RestClientAdapter adapter =
                 RestClientAdapter.create(restClient);
 
 
-        /*
-         * 7. Create HTTP interface proxy
-         */
         HttpServiceProxyFactory factory =
                 HttpServiceProxyFactory
                         .builderFor(adapter)
                         .build();
 
 
-        /*
-         * 8. Generate LocationClient implementation
-         */
         return factory.createClient(LocationClient.class);
     }
 }
